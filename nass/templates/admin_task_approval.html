@@ -1,0 +1,133 @@
+<!-- admin_task_approval.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Approvals</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    .status-pending_review { background-color: #ffc107; color: #000; }
+    .status-approved { background-color: #198754; color: #fff; }
+    .status-rejected { background-color: #dc3545; color: #fff; }
+    .proof-image {
+      max-width: 100px;
+      cursor: pointer;
+    }
+    .modal-image {
+      max-width: 100%;
+      max-height: 80vh;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Task Approvals</h1>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+    
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>User</th>
+            <th>Task</th>
+            <th>Proof</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+            <tr>
+              <td>{{ task.user.username }}</td>
+              <td>{{ task.task.title }}</td>
+              <td>
+                {% if task.screenshot %}
+                  <img src="{{ task.screenshot.url }}" class="proof-image" 
+                       data-bs-toggle="modal" data-bs-target="#proofModal"
+                       data-img-src="{{ task.screenshot.url }}">
+                {% else %}
+                  No screenshot
+                {% endif %}
+                {% if task.proof_text %}
+                  <div class="mt-2"><strong>Description:</strong> {{ task.proof_text }}</div>
+                {% endif %}
+              </td>
+              <td>
+                <span class="status-badge status-{{ task.submission_status }}">
+                  {{ task.get_submission_status_display }}
+                </span>
+              </td>
+              <td>
+                {% if task.submission_status == 'pending_review' %}
+                  <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                    <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject</button>
+                  </form>
+                {% else %}
+                  <span class="text-muted">Completed</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">No tasks pending approval</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Proof Modal -->
+  <div class="modal fade" id="proofModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Task Proof</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="modalProofImage" src="" class="modal-image">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Initialize modal with proof image
+    const proofModal = document.getElementById('proofModal');
+    if (proofModal) {
+      proofModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const imgSrc = button.getAttribute('data-img-src');
+        const modalImage = proofModal.querySelector('#modalProofImage');
+        modalImage.src = imgSrc;
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Map</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        #Back-btn {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            text-decoration: none;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        #Back-btn:hover {
+            transform: translateY(-2px);
+            background-color: #2980b9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        #view-map {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            min-height: 600px;
+            padding: 20px 0;
+            overflow: auto;
+        }
+        
+        .node circle {
+            fill: #3498db;
+            stroke: #2980b9;
+            stroke-width: 2px;
+        }
+        
+        .node text {
+            font-size: 12px;
+            font-family: sans-serif;
+            fill: #333;
+        }
+        
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 1.5px;
+        }
+        
+        .node image {
+            border-radius: 50%;
+        }
+        
+        .expandable {
+            cursor: pointer;
+        }
+        
+        .expandable circle {
+            fill: #2ecc71;
+            stroke: #27ae60;
+        }
+        
+        .expandable:hover circle {
+            fill: #27ae60;
+        }
+        
+        .back-node {
+            cursor: pointer;
+        }
+        
+        .back-node circle {
+            fill: #e74c3c;
+            stroke: #c0392b;
+        }
+        
+        .back-node:hover circle {
+            fill: #c0392b;
+        }
+        
+        .breadcrumbs {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .breadcrumb {
+            display: inline-block;
+            margin-right: 5px;
+            cursor: pointer;
+            color: #3498db;
+            padding: 5px 8px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+        
+        .breadcrumb:hover {
+            text-decoration: underline;
+            background-color: #e8f4fc;
+        }
+        
+        .breadcrumb-separator {
+            display: inline-block;
+            margin: 0 8px;
+            color: #7f8c8d;
+        }
+        
+        .node-name {
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            word-wrap: break-word;
+            max-width: 100px;
+            text-align: center;
+        }
+        
+        .node-expand-text {
+            font-size: 10px;
+            letter-spacing: 0.2px;
+        }
+        
+        .back-text {
+            font-weight: 500;
+        }
+        
+        .node-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .node-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .node-labels {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 5px;
+        }
+        
+        svg {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Users Tree Map</h1>
+        <a href="{% url 'admin_dashboard' %}" id="Back-btn">Back to Dashboard</a>
+        
+        <div id="breadcrumbs" class="breadcrumbs"></div>
+        <div id="view-map"></div>
+    </div>
+    
+    <script>
+    let fullData = null;
+    let currentRoot = null;
+    let currentPath = [];
+    const initialDepth = 2;
+    const nodeSpacing = 120; // Horizontal spacing between nodes
+    const levelSpacing = 120; // Vertical spacing between levels
+
+    fetch('/view_map_api/')
+        .then(response => response.json())
+        .then(data => {
+            fullData = data;
+            currentRoot = data;
+            currentPath = [{name: data.name, id: data.id}];
+            updateBreadcrumbs();
+            // Create a limited version of the data for initial view
+            const limitedData = limitTreeDepth(data, initialDepth);
+            renderTreeDiagram(limitedData);
+        })
+        .catch(error => console.error('Error fetching the hierarchy data:', error));
+
+    function limitTreeDepth(data, maxDepth, currentDepth = 0) {
+        if (currentDepth >= maxDepth) {
+            // For nodes at max depth, keep structure but mark as expandable
+            if (data.children && data.children.length > 0) {
+                return {
+                    ...data,
+                    children: [],
+                    _children: data.children,
+                    expandable: true
+                };
+            }
+            return data;
+        }
+        
+        // Create a copy of the data
+        const limitedData = {...data};
+        
+        // Process children recursively
+        if (limitedData.children && limitedData.children.length > 0) {
+            limitedData.children = limitedData.children.map(child => 
+                limitTreeDepth(child, maxDepth, currentDepth + 1)
+            );
+        }
+        
+        return limitedData;
+    }
+
+    function renderTreeDiagram(data) {
+        // Clear previous diagram
+        d3.select("#view-map").html("");
+        
+        // Dimensions
+        const containerWidth = document.querySelector('.container').clientWidth - 100;
+        const containerHeight = Math.min(700, window.innerHeight - 200);
+        
+        // Create SVG container
+        const svg = d3.select("#view-map")
+            .append("svg")
+            .attr("width", "100%")
+            .attr("height", containerHeight)
+            .attr("viewBox", [0, 0, containerWidth, containerHeight])
+            .attr("preserveAspectRatio", "xMidYMid meet");
+        
+        const g = svg.append("g").attr("transform", "translate(50,50)");
+        
+        // Tree layout with adjusted spacing
+        const tree = d3.tree()
+            .nodeSize([nodeSpacing, levelSpacing])
+            .separation((a, b) => (a.parent === b.parent ? 1 : 1.5));
+        
+        const root = d3.hierarchy(data);
+        
+        // Generate tree data
+        tree(root);
+        
+        // Calculate the required width based on the tree structure
+        const nodes = root.descendants();
+        const minX = d3.min(nodes, d => d.x);
+        const maxX = d3.max(nodes, d => d.x);
+        const treeWidth = maxX - minX + nodeSpacing * 2;
+        
+        // Adjust viewBox if tree is wider than container
+        const effectiveWidth = Math.max(containerWidth, treeWidth);
+        svg.attr("viewBox", [0, 0, effectiveWidth, containerHeight]);
+        
+        // Center the tree horizontally
+        const xOffset = (effectiveWidth - (maxX - minX)) / 2 - minX;
+        g.attr("transform", `translate(${xOffset},50)`);
+        
+        // Links
+        g.selectAll(".link")
+            .data(root.links())
+            .enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("d", d3.linkVertical()
+                .x(d => d.x)
+                .y(d => d.y))
+            .style("stroke", "#aaa")
+            .style("stroke-width", 2);
+        
+        // Nodes container
+        const nodeGroups = g.selectAll(".node")
+            .data(root.descendants())
+            .enter()
+            .append("g")
+            .attr("class", d => "node" + (d.data.expandable ? " expandable" : ""))
+            .attr("transform", d => `translate(${d.x},${d.y})`)
+            .on("click", (event, d) => {
+                if (d.data.expandable) {
+                    // Drill down to this node
+                    drillDown(d.data);
+                }
+            });
+
+        // Add back node if we're not at the top level
+        if (currentPath.length > 1) {
+            const backNode = g.append("g")
+                .attr("class", "node back-node")
+                .attr("transform", `translate(${root.x},${root.y - 80})`)
+                .on("click", () => {
+                    navigateUp();
+                });
+            
+            backNode.append("circle")
+                .attr("r", 15)
+                .attr("fill", "#e74c3c")
+                .attr("stroke", "#c0392b")
+                .attr("stroke-width", 2);
+            
+            backNode.append("text")
+                .attr("dy", 25)
+                .attr("x", 0)
+                .style("text-anchor", "middle")
+                .style("font-size", "12px")
+                .style("fill", "#555")
+                .attr("class", "back-text")
+                .text("Back");
+        }
+        
+        // Node content container
+        const nodeContainers = nodeGroups.append("g")
+            .attr("class", "node-container");
+        
+        // Node visual elements container
+        const nodeContents = nodeContainers.append("g")
+            .attr("class", "node-content");
+        
+        // Add circles as background for images
+        nodeContents.append("circle")
+            .attr("r", 15)
+            .attr("fill", d => d.data.expandable ? "#2ecc71" : "#3498db")
+            .attr("stroke", d => d.data.expandable ? "#27ae60" : "#2980b9")
+            .attr("stroke-width", 2);
+        
+        // Add user images
+        nodeContents.append("image")
+            .attr("xlink:href", "/static/images/user.png") 
+            .attr("x", -12) 
+            .attr("y", -12) 
+            .attr("width", 24) 
+            .attr("height", 24)
+            .attr("clip-path", "circle(12px at 12px 12px)");
+        
+        // Node labels container
+        const nodeLabels = nodeContainers.append("g")
+            .attr("class", "node-labels");
+        
+        // Add names with better spacing
+        nodeLabels.append("text")
+            .attr("dy", 25)
+            .attr("x", 0)
+            .style("text-anchor", "middle")
+            .style("font-size", "12px")
+            .style("fill", "#555")
+            .attr("class", "node-name")
+            .text(d => {
+                // Split long names into multiple lines
+                const name = d.data.name;
+                if (name.length > 12) {
+                    const middle = Math.floor(name.length / 2);
+                    const spaceIndex = name.lastIndexOf(' ', middle);
+                    if (spaceIndex !== -1) {
+                        return [name.substring(0, spaceIndex), name.substring(spaceIndex + 1)];
+                    }
+                }
+                return name;
+            })
+            .selectAll("tspan")
+            .data(d => {
+                const text = d.data.name;
+                if (text.length > 12) {
+                    const middle = Math.floor(text.length / 2);
+                    const spaceIndex = text.lastIndexOf(' ', middle);
+                    if (spaceIndex !== -1) {
+                        return [text.substring(0, spaceIndex), text.substring(spaceIndex + 1)];
+                    }
+                }
+                return [text];
+            })
+            .enter()
+            .append("tspan")
+            .attr("x", 0)
+            .attr("dy", (d, i) => i ? "1.2em" : 0)
+            .text(d => d);
+            
+        // Add expand indicator for expandable nodes
+        nodeLabels.filter(d => d.data.expandable)
+            .append("text")
+            .attr("dy", (d => d.data.name.length > 12 ? 45 : 40))
+            .attr("x", 0)
+            .style("text-anchor", "middle")
+            .style("font-size", "10px")
+            .style("fill", "#2ecc71")
+            .attr("class", "node-expand-text")
+            .text("(click to expand)");
+    }
+
+    function drillDown(nodeData) {
+        // Add this node to the current path
+        currentPath.push({name: nodeData.name, id: nodeData.id});
+        updateBreadcrumbs();
+        
+        // Set this node as the new root (with its children expanded)
+        currentRoot = {
+            ...nodeData,
+            children: nodeData._children || nodeData.children || []
+        };
+        
+        // Render with this node as the root
+        const limitedData = limitTreeDepth(currentRoot, initialDepth);
+        renderTreeDiagram(limitedData);
+    }
+
+    function navigateUp() {
+        if (currentPath.length <= 1) return;
+        
+        // Remove current node from path
+        currentPath.pop();
+        updateBreadcrumbs();
+        
+        // If we're going back to the top, use the full data
+        if (currentPath.length === 1) {
+            currentRoot = fullData;
+        } else {
+            // Otherwise find the node in the hierarchy
+            currentRoot = findNodeInHierarchy(fullData, currentPath.slice(1));
+        }
+        
+        // Render the limited view
+        const limitedData = limitTreeDepth(currentRoot, initialDepth);
+        renderTreeDiagram(limitedData);
+    }
+
+    function findNodeInHierarchy(root, path) {
+        let currentNode = root;
+        for (const segment of path) {
+            currentNode = currentNode.children.find(c => c.name === segment.name && c.id === segment.id);
+            if (!currentNode) break;
+        }
+        return currentNode || root;
+    }
+
+    function updateBreadcrumbs() {
+        const breadcrumbs = d3.select("#breadcrumbs");
+        breadcrumbs.html("");
+        
+        currentPath.forEach((segment, i) => {
+            if (i > 0) {
+                breadcrumbs.append("span")
+                    .attr("class", "breadcrumb-separator")
+                    .text("›");
+            }
+            
+            breadcrumbs.append("span")
+                .attr("class", "breadcrumb")
+                .text(segment.name)
+                .on("click", () => {
+                    if (i < currentPath.length - 1) {
+                        // Navigate to this level
+                        currentPath = currentPath.slice(0, i + 1);
+                        if (i === 0) {
+                            currentRoot = fullData;
+                        } else {
+                            currentRoot = findNodeInHierarchy(fullData, currentPath.slice(1));
+                        }
+                        const limitedData = limitTreeDepth(currentRoot, initialDepth);
+                        renderTreeDiagram(limitedData);
+                        updateBreadcrumbs();
+                    }
+                });
+        });
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (currentRoot) {
+            const limitedData = limitTreeDepth(currentRoot, initialDepth);
+            renderTreeDiagram(limitedData);
+        }
+    });
+    </script>
+</body>
+</html>

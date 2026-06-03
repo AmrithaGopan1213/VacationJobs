@@ -1,0 +1,282 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.Background {
+    /* background-image: url('/static/Images/lexovertoo.jpg');   */
+    background-size: cover;  
+    background-repeat: no-repeat;  
+    background-position: center;  
+    background-color: #e9c8c8;
+    position: fixed;  
+    height: 100vh;
+    width: 100%;
+    top: 0;
+    left: 0; 
+    z-index: -1;  
+}
+h1{
+    color:black;
+    margin: 0px;
+    text-align: center;
+    left: 50%;
+    position: fixed;  
+    top: 40px;
+    transform: translateX(-50%);
+    z-index: 1;  
+}
+.container{
+    width:300px;
+    height: 100%;
+    margin: 150px 10px;  
+    color: black;
+    border:solid rgb(0, 0, 0);
+    z-index: 1;  
+    position: absolute; 
+    top: -150px;  
+}
+.logo {
+    background-image: url('/static/Images/nassonline.jpg'); 
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    width: 46%; 
+    height: 8%; 
+    position: absolute; 
+    top: 1%; 
+    left: 25%;
+    border-radius: 10px;
+}
+.nav-container {
+    background-color: transparent;
+    position: absolute;
+    top: 90px; 
+    left: 45%; 
+    transform: translateX(-50%); 
+    display: flex; 
+    gap: 25px; 
+    flex-direction: column; 
+    align-items: center; 
+}
+.btn {
+    background-color: rgb(0, 0, 0); 
+    border-radius: 8px; 
+    color: white; 
+    padding: 12px 16px; 
+    font-size: 16px; 
+    cursor: pointer; 
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    width: 250px; 
+    margin-left: 35px;
+    position: relative; 
+}
+.btn i {
+    margin-right: 10px;
+}
+.btn:hover {
+    background-color: rgb(35, 76, 63);
+}
+.chevron-icon {
+    width: 18px;
+    height: 18px;
+    margin-left: 50px;
+    cursor: pointer;
+    transition: transform 0.3s ease; 
+}
+.tableclass table {
+    margin-top: 20px;
+    margin-left: 10px;
+}
+
+.tableclass table thead tr th {
+    color: #000000; 
+    text-align: center; 
+    padding: 10px; 
+    margin-left: 160px;
+}
+
+.tableclass table tbody tr td {
+    padding: 8px; 
+    border: 1px solid #490303; 
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    align-items: center;
+    background-color:white;
+    min-width: 80px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2); 
+    z-index: 1;
+    top: -4.5%; 
+    left: 110%;
+    border-radius: 8px;
+    padding: 0; 
+    list-style-type: none; 
+}
+.dropdown-content li {
+    position: relative; 
+    display: flex;
+    align-items: center; 
+    gap: 8px; 
+    margin-left: 20px;
+}
+.dropdown-content li a {
+    color: black;
+    padding:8px 12px;
+    text-decoration: none;
+    display: flex;
+    align-items:baseline; 
+    justify-content: center; 
+    gap: 8px; 
+}
+.dropdown-content li a:hover {
+    background-color: #f1f1f1;;
+}
+
+.btn.active .chevron-icon {
+    transform: rotate(90deg); 
+}
+
+.chevron-icon.active {
+    transform: rotate(90deg); 
+}
+
+.nested-dropdown-content {
+    display: none;  
+    position: absolute;
+    min-width: 200px;
+    left: 1%;  
+    top: 120%;
+    background-color: white;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    list-style-type: none;
+    padding: 0;
+}
+
+.nested-dropdown-content li {
+    margin-bottom: 15px; 
+    margin-left: 20px;
+}
+
+.nested-dropdown-content li a {
+    color: black;
+    text-decoration: none;
+    display: block;
+}
+
+.nested-dropdown-content li a:hover {
+    background-color: #f1f1f1;
+}
+.dropdown:hover .nested-dropdown-content {
+    display: block; 
+}
+
+.btn1 {
+    background-color: rgb(0, 0, 0); 
+    border-radius: 8px; 
+    color: white; 
+    padding: 12px 16px; 
+    font-size: 16px;
+    cursor: pointer; 
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
+    width: 250px; 
+    margin-left: 35px;
+    position: relative; 
+}
+
+.btn1 i {
+    margin-right: 23px;
+}
+
+.btn1:hover {
+    background-color: rgb(35, 76, 63);
+}
+
+.main {
+display:none;  
+flex-direction: column;  
+justify-content: flex-start;  
+border-radius: 8px;
+margin-top: -5px;
+width: 200%;  
+margin-left: 125%; 
+top: 20%;
+}
+
+.main h2{
+margin-left: 20%;
+margin-top: 20px; 
+color: #0f0f0f;
+font-size: 34px;
+text-align: center;
+}
+
+.button-container {
+    display: flex;
+    justify-content: right;
+    margin-right: 30px;    
+}
+
+.firstbtn{
+    background-color: #024E59;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 28px;
+    text-decoration: none;
+    margin: 4px 2px;
+    margin-left: 600%;
+    margin-top:20px ;
+    cursor: pointer; 
+    transition : transform 0.3s;
+}
+
+.firstbtn:hover {
+    background-color: rgb(58, 120, 100);
+    transform: scale(1.1);
+}
+
+.logout-btn {
+    background-color: #024E59;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 28px;
+    text-decoration: none;
+    margin: 4px 2px;
+    margin-left: 5%;
+    margin-top:20px ;
+    cursor: pointer; 
+    transition : transform 0.3s;
+}        
+
+.logout-btn:hover {
+    background-color: rgb(58, 120, 100); 
+    transform: scale(1.1);
+}
+
+.alert-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50; 
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 1000;
+}
+
+.alert-box .close-btn {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 16px;
+    margin-left: 15px;
+}

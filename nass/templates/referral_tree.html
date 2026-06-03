@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Network Flowchart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            '50': '#f0f9ff',
+                            '100': '#e0f2fe',
+                            '200': '#bae6fd',
+                            '300': '#7dd3fc',
+                            '400': '#38bdf8',
+                            '500': '#0ea5e9',
+                            '600': '#0284c7',
+                            '700': '#0369a1',
+                            '800': '#075985',
+                            '900': '#0c4a6e',
+                        },
+                        secondary: {
+                            '50': '#f0fdf4',
+                            '100': '#dcfce7',
+                            '200': '#bbf7d0',
+                            '300': '#86efac',
+                            '400': '#4ade80',
+                            '500': '#22c55e',
+                            '600': '#16a34a',
+                            '700': '#15803d',
+                            '800': '#166534',
+                            '900': '#14532d',
+                        },
+                        accent: {
+                            '50': '#fff7ed',
+                            '100': '#ffedd5',
+                            '200': '#fed7aa',
+                            '300': '#fdba74',
+                            '400': '#fb923c',
+                            '500': '#f97316',
+                            '600': '#ea580c',
+                            '700': '#c2410c',
+                            '800': '#9a3412',
+                            '900': '#7c2d12',
+                        },
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+
+        function copyReferralLink() {
+            const copyText = document.getElementById("referralLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            
+            const tooltip = document.getElementById("copyTooltip");
+            tooltip.classList.remove("hidden", "opacity-0");
+            tooltip.classList.add("opacity-100");
+            setTimeout(() => {
+                tooltip.classList.add("opacity-0");
+                setTimeout(() => tooltip.classList.add("hidden"), 300);
+            }, 2000);
+        }
+
+        // Toggle dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.level-toggle').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const targetId = button.getAttribute('data-target');
+                    const target = document.getElementById(targetId);
+                    const icon = button.querySelector('i');
+                    
+                    target.classList.toggle('hidden');
+                    icon.classList.toggle('fa-chevron-down');
+                    icon.classList.toggle('fa-chevron-up');
+                });
+            });
+
+            // Add ripple effect to buttons
+            document.querySelectorAll('.ripple-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple-effect';
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+    <style>
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(90deg, #4F46E5, #7C3AED);
+        }
+        
+        .vertical-flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding: 2rem 0;
+        }
+        
+        .level-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .user-card {
+            position: relative;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        
+        .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .connector-line {
+            position: absolute;
+            height: 20px;
+            width: 2px;
+            background: #cbd5e1;
+            left: 50%;
+            top: -20px;
+            transform: translateX(-50%);
+        }
+        
+        .connector-line-horizontal {
+            position: absolute;
+            height: 2px;
+            width: 20px;
+            background: #cbd5e1;
+            top: 50%;
+            left: -20px;
+        }
+        
+        .level-0 .user-card {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            color: white;
+        }
+        
+        .level-1 .user-card {
+            background: white;
+            border-left: 4px solid #10B981;
+        }
+        
+        .level-2 .user-card {
+            background: #F9FAFB;
+            border-left: 4px solid #F59E0B;
+        }
+        
+        .level-3 .user-card {
+            background: #F3F4F6;
+            border-left: 4px solid #6366F1;
+        }
+        
+        .network-branch {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .branch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .branch-line {
+            position: absolute;
+            height: 100%;
+            width: 2px;
+            background: #e5e7eb;
+            left: 50%;
+            top: 0;
+            z-index: -1;
+        }
+        
+        .branch-children {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-left: 2rem;
+            position: relative;
+        }
+        
+        .branch-children::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        
+        /* Ripple effect */
+        .ripple-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* Glow effect for premium users */
+        .glow-card {
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.3);
+        }
+        
+        .glow-card:hover {
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.5);
+        }
+        
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: #1E293B;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+        
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1E293B transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .network-branch {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: flex-start;
+            }
+            
+            .branch-container {
+                margin: 0 1rem;
+            }
+            
+            .branch-line {
+                display: none;
+            }
+            
+            .branch-children {
+                padding-left: 0;
+            }
+            
+            .branch-children::before {
+                display: none;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .user-card {
+                max-width: 320px;
+            }
+        }
+        
+        /* Animation classes */
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-bounce-slow {
+            animation: bounce-slow 3s infinite;
+        }
+        
+        .animate-fade-in {
+            animation: fade-in 0.5s ease-in;
+        }
+        
+        .animate-slide-up {
+            animation: slide-up 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+    
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="relative">
+  <a href="{% url 'user_dashboard' %}" 
+     class="absolute top-2 right-2 text-white bg-red-500 hover:bg-red-600 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-red-400">
+    ✕
+  </a>
+  
+  <!-- Your content goes here -->
+</div>
+
+        <!-- Header Section with Animation -->
+        <div class="text-center mb-8 animate-slide-up">
+            
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                <span class="gradient-text">Referral Network</span> Flowchart
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Visual representation of your referral hierarchy and network growth</p>
+        </div>
+
+        <!-- Stats and Referral Link -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Referral Link Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2 transition-all duration-300 hover:shadow-md">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <i class="fas fa-link text-primary-500 mr-2 animate-pulse-slow"></i> Your Referral Link
+                        </h2>
+                        <p class="text-sm text-gray-500 mt-1">Share this link to expand your network</p>
+                    </div>
+                    <div class="relative w-full sm:w-auto mt-2 sm:mt-0">
+                        <span id="copyTooltip" class="hidden opacity-0 absolute -top-8 left-1/2 transform -translate-x-1/2 bg-primary-600 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap shadow transition-opacity duration-300">
+                            <i class="fas fa-check mr-1"></i> Copied to clipboard!
+                        </span>
+                        <button onclick="copyReferralLink()" class="ripple-btn flex items-center text-sm bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-4 py-2.5 rounded-lg transition-all shadow-sm w-full sm:w-auto justify-center">
+                            <i class="far fa-copy mr-2"></i> Copy Referral Link
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="relative">
+                        <input type="text" id="referralLink" value="{{ referral_link }}" 
+                               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm transition-all duration-200">
+                        <div class="absolute right-2 top-2">
+                            <span class="text-xs bg-primary-100 text-primary-800 px-2 py-1 rounded-full">Active</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="mt-4 flex flex-wrap gap-2">
+                    <button class="flex items-center text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full transition">
+                        <i class="fab fa-whatsapp text-green-500 mr-1.5"></i> Share on WhatsApp
+                    </button>
+                    <button class="flex items-center text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full transition">
+                        <i class="fab fa-telegram text-blue-500 mr-1.5"></i> Share on Telegram
+                    </button>
+                    <button class="flex items-center text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full transition">
+                        <i class="fas fa-envelope text-red-500 mr-1.5"></i> Email Link
+                    </button>
+                </div> -->
+            </div>
+
+            <!-- Stats Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all duration-300 hover:shadow-md">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-chart-line text-primary-500 mr-2 animate-bounce-slow"></i> Network Statistics
+                </h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-xl border border-gray-100">
+                        <p class="text-xs text-gray-500 font-medium">Total Network</p>
+                        <p class="text-2xl font-bold text-gray-800 mt-1">{{ total_referrals }}</p>
+                        <div class="flex items-center mt-1">
+                            <span class="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded-full">+12%</span>
+                            <span class="text-xs text-gray-500 ml-1">from last month</span>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-xl border border-gray-100">
+                        <p class="text-xs text-gray-500 font-medium">Direct Referrals</p>
+                        <p class="text-2xl font-bold text-gray-800 mt-1">{{ referral_tree.children|length }}</p>
+                        <div class="flex items-center mt-1">
+                            <span class="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded-full">+5%</span>
+                            <span class="text-xs text-gray-500 ml-1">from last month</span>
+                        </div>
+                    </div>
+                    
+                </div>
+                <!-- <div class="mt-4 pt-3 border-t border-gray-100">
+                    <button class="w-full text-sm bg-gray-50 hover:bg-gray-100 text-primary-600 font-medium px-3 py-2 rounded-lg transition flex items-center justify-center">
+                        <i class="fas fa-chart-simple mr-2"></i> 
+                    </button>
+                </div> -->
+            </div>
+        </div>
+
+        <!-- Vertical Flowchart Visualization -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-8 animate-fade-in">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-project-diagram text-primary-500 mr-2"></i> Network Flowchart
+                </h2>
+                <!-- <div class="mt-3 sm:mt-0 flex items-center">
+                    <span class="text-xs text-gray-500 mr-2">Filter:</span>
+                    <select class="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                        <option>All Levels</option>
+                        <option>Level 1 Only</option>
+                        <option>Level 2 Only</option>
+                        <option>Level 3 Only</option>
+                    </select>
+                    <button class="ml-2 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded-lg transition">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div> -->
+            </div>
+            
+            {% if total_referrals > 0 %}
+            <div class="vertical-flowchart">
+                <!-- Level 0 (You) -->
+                <div class="level-container level-0">
+                    <div class="user-card p-5 rounded-xl shadow-lg mb-4 glow-card animate-float">
+                        <div class="flex items-center mb-3">
+                            {% if referral_tree.register.images %}
+                            <img src="{{ referral_tree.register.images.url }}" alt="{{ referral_tree.user.username }}" 
+                                 class="w-12 h-12 rounded-full object-cover mr-3 border-2 border-white border-opacity-50 shadow-md">
+                            {% else %}
+                            <div class="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-white mr-3 border-2 border-white border-opacity-50 shadow-md">
+                                <i class="fas fa-user text-xl"></i>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h3 class="font-bold">{{ referral_tree.register.first_name|default:referral_tree.user.username }}</h3>
+                                <p class="text-xs opacity-90">@{{ referral_tree.user.username }}</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full">
+                                <i class="fas fa-crown mr-1"></i> You
+                            </span>
+                            <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full">
+                                {{ referral_tree.children|length }} direct
+                            </span>
+                        </div>
+                       
+                    </div>
+                </div>
+
+                <!-- Level 1 -->
+                {% if referral_tree.children %}
+                <div class="level-container level-1">
+                    <div class="network-branch">
+                        {% for child in referral_tree.children %}
+                        <div class="branch-container">
+                            <div class="branch-line"></div>
+                            <div class="user-card p-4 rounded-lg shadow-sm mb-4 relative hover:shadow-md transition-all duration-200">
+                                <div class="connector-line"></div>
+                                <div class="flex items-center mb-2">
+                                    {% if child.register.images %}
+                                    <img src="{{ child.register.images.url }}" alt="{{ child.user.username }}" 
+                                         class="w-10 h-10 rounded-full object-cover mr-2 border-2 border-green-500 shadow-sm">
+                                    {% else %}
+                                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 mr-2 border-2 border-green-500 shadow-sm">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h4 class="font-semibold text-sm text-gray-800">{{ child.register.first_name|default:child.user.username }}</h4>
+                                        <p class="text-xs text-gray-500">@{{ child.user.username }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <div class="flex items-center">
+                                        <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                                            Level 1
+                                        </span>
+                                        <div class="tooltip ml-1">
+                                            <i class="fas fa-info-circle text-gray-400 cursor-pointer"></i>
+                                            <span class="tooltip-text">Joined on {{ child.register.created_at|date:"M d, Y" }}</span>
+                                        </div>
+                                    </div>
+                                    {% if child.children %}
+                                    <button data-target="level1-{{ forloop.counter }}" class="level-toggle text-primary-500 hover:text-primary-600 ripple-btn px-2 py-0.5 rounded">
+                                        <i class="fas fa-chevron-down text-xs mr-1"></i> {{ child.children|length }} referrals
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Level 2 -->
+                            {% if child.children %}
+                            <div id="level1-{{ forloop.counter }}" class="branch-children hidden">
+                                {% for grandchild in child.children %}
+                                <div class="user-card p-3 rounded-md shadow-xs mb-4 relative hover:shadow-sm transition-all duration-200">
+                                    <div class="connector-line"></div>
+                                    <div class="flex items-center">
+                                        {% if grandchild.register.images %}
+                                        <img src="{{ grandchild.register.images.url }}" alt="{{ grandchild.user.username }}" 
+                                             class="w-8 h-8 rounded-full object-cover mr-2 border-2 border-yellow-500 shadow-xs">
+                                        {% else %}
+                                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-2 border-2 border-yellow-500 shadow-xs">
+                                            <i class="fas fa-user text-sm"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <h5 class="font-medium text-xs text-gray-800">{{ grandchild.register.first_name|default:grandchild.user.username|truncatechars:12 }}</h5>
+                                            <p class="text-xxs text-gray-500">@{{ grandchild.user.username|truncatechars:8 }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center mt-1 text-xxs">
+                                        <div class="flex items-center">
+                                            <span class="bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-full">
+                                                Level 2
+                                            </span>
+                                        </div>
+                                        {% if grandchild.children %}
+                                        <button data-target="level2-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="level-toggle text-primary-500 hover:text-primary-600 ripple-btn px-1.5 py-0.5 rounded">
+                                            <i class="fas fa-chevron-down text-xxs mr-0.5"></i> {{ grandchild.children|length }}
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Level 3 -->
+                                    {% if grandchild.children %}
+                                    <div id="level2-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="branch-children hidden mt-2">
+                                        {% for ggchild in grandchild.children %}
+                                        <div class="user-card p-2 rounded shadow-xs mb-2 relative hover:shadow-xs transition-all duration-200">
+                                            <div class="connector-line"></div>
+                                            <div class="flex items-center">
+                                                {% if ggchild.register.images %}
+                                                <img src="{{ ggchild.register.images.url }}" alt="{{ ggchild.user.username }}" 
+                                                     class="w-6 h-6 rounded-full object-cover mr-1 border-2 border-indigo-500">
+                                                {% else %}
+                                                <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 mr-1 border-2 border-indigo-500">
+                                                    <i class="fas fa-user text-xs"></i>
+                                                </div>
+                                                {% endif %}
+                                                <span class="truncate text-xs">{{ ggchild.register.first_name|default:ggchild.user.username|truncatechars:10 }}</span>
+                                            </div>
+                                            <div class="mt-0.5 flex justify-between items-center">
+                                                <span class="bg-indigo-100 text-indigo-800 px-1 py-0.5 rounded-full text-xxs">Level 3</span>
+                                                <span class="text-xxs text-gray-400">{{ ggchild.register.created_at|date:"M d" }}</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <!-- Empty State with Animation -->
+            <div class="text-center py-12 animate-fade-in">
+                <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-float">
+                    <i class="fas fa-users text-3xl text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-700 mb-2">Your network is empty</h3>
+                <p class="text-gray-500 max-w-md mx-auto mb-4 text-sm">Start building your empire by sharing your referral link with friends and colleagues</p>
+                <button onclick="copyReferralLink()" class="ripple-btn bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-5 py-2 rounded-lg transition text-sm inline-flex items-center shadow-md">
+                    <i class="far fa-copy mr-2"></i> Copy Referral Link
+                </button>
+                <div class="mt-6">
+                    <p class="text-xs text-gray-400 mb-2">Need help growing your network?</p>
+                    <button class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full transition flex items-center mx-auto">
+                        <i class="fas fa-lightbulb mr-1.5 text-yellow-500"></i> View Growth Tips
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gray-500 text-sm mb-4 md:mb-0">
+                    © 2025 Referral Network System. All rights reserved.
+                </div>
+                <div class="flex space-x-4">    
+                    <a href="#" class="text-gray-500 hover:text-primary-600 transition">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary-600 transition">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary-600 transition">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary-600 transition">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

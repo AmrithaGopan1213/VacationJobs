@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #5e35b1;
+            --secondary-color: #4527a0;
+            --accent-color: #7c4dff;
+            --light-color: #f8f9fa;
+            --dark-color: #263238;
+            --success-color: #00c853;
+            --danger-color: #ff5252;
+            --warning-color: #ffab00;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 1rem;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        /* Mobile Toggle Button */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+        }
+
+        .app-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .app-logo-img {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+        }
+
+        .app-logo-text {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .user-info h3 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background-color: #ff1744;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            color: white;
+            text-decoration: none;
+            display: block;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .chevron-icon {
+            transition: var(--transition);
+        }
+
+        .chevron-icon.rotate {
+            transform: rotate(90deg);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .welcome-message {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .card-content {
+            color: #6c757d;
+        }
+
+        /* Bank Details Section */
+        .bank-details-section {
+            margin-top: 2rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .bank-details-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .bank-details-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            color: #6c757d;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            align-self: flex-start;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+        }
+
+        /* Popup Styles */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .popup.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: var(--transition);
+        }
+
+        .popup.show .popup-content {
+            transform: translateY(0);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(124, 77, 255, 0.25);
+        }
+
+        .popup-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Error Message Styles */
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .form-group.error .form-input {
+            border-color: var(--danger-color);
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        /* Success Message Styles */
+        .success-message {
+            background-color: rgba(0, 200, 83, 0.1);
+            color: var(--success-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -250px;
+                width: 250px;
+                height: 100vh;
+                transition: var(--transition);
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: 5rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .bank-details-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .popup-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Mobile Menu Toggle Button -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="app-logo">
+                <div class="app-logo-img"></div>
+                <span class="app-logo-text">NassOnline</span>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">{{ person.first_name|first }}{{ person.last_name|first }}</div>
+                <div class="user-info">
+                    <h3>{{ person.first_name }} {{ person.last_name }}</h3>
+                    <p>Member</p>
+                </div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'profile_view' %}" class="nav-link">
+                        <i class="fas fa-user nav-icon"></i>
+                        <span>My Profile</span>
+                    </a>
+
+                    
+                </li>
+                <li class="nav-item">
+                    
+
+                     <a class="nav-link" href="{% url 'referral_tree' %}"><i class="fas fa-network-wired nav-icon"></i> My Referral Network</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#" class="nav-link dropdown-toggle" id="dashboardDropdown">
+                        <i class="fas fa-dollar-sign nav-icon"></i>
+                        <span>EARNINGS</span>
+                        <i class="fas fa-chevron-right chevron-icon" style="font-size: 0.8rem; margin-left: auto;"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="dashboardMenu">
+                        <li class="dropdown-item">
+                            <div class="dropdown-toggle" id="overviewDropdown">
+                                
+                            </div>
+                            <ul class="dropdown-menu" id="overviewMenu">
+                                <!-- <li><a href="#" class="dropdown-item">Total Commission</a></li>
+                                <li><a href="#" class="dropdown-item">Lifelong Commission</a></li> -->
+                            </ul>
+                        </li>
+                        <li><a href="{% url 'JobList' %}" class="dropdown-item">My Tasks</a></li>
+                        <li><a href="{% url 'bank_details' %}" class="dropdown-item">Bank Details</a></li>
+                        <li><a href="{% url 'dashboard' %}" class="dropdown-item">Withdrawal</a></li>
+                        
+                    </ul>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#" class="nav-link dropdown-toggle" id="withdrawalDropdown">
+                        <i class="fas fa-question nav-icon"></i>
+                        <span>HELP</span>
+                        <i class="fas fa-chevron-right chevron-icon" style="font-size: 0.8rem; margin-left: auto;"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="withdrawalMenu">
+                        <li><a href="{% url 'support' %}" class="dropdown-item">Support</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="header">
+                <div>
+                    <h1 class="page-title">VACATIONJOBS</h1>
+                    <p class="welcome-message">Welcome back, {{ person.first_name }}!</p>
+                </div>
+                <a href="{% url 'Logout' %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+
+            <!-- Success Message (hidden by default) -->
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> Bank details updated successfully!
+            </div>
+
+            <div class="card-container">
+                <div class="card">
+                    <h3 class="card-title">My Profile</h3>
+                    <p class="card-content">View and update your personal information and account settings.</p>
+                </div>
+                
+                <div class="card">
+                    <h3 class="card-title">Tasks Overview</h3>
+                    <p class="card-content">Check your current tasks and completed assignments.</p>
+                </div>
+                
+                <div class="card">
+                    <h3 class="card-title">Withdraw Funds</h3>
+                    <p class="card-content">Request withdrawals and view your transaction history.</p>
+                </div>
+            </div>
+
+        <!-- Bank Details Popup -->
+<div class="popup" id="bankDetailsPopup">
+    <div class="popup-content">
+        <h3 style="margin-bottom: 1.5rem;">Bank Details</h3>
+        
+        <form id="bankDetailsForm" method="POST" action="{% url 'bank_details' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Account Holder Name*</label>
+                <input type="text" class="form-control" name="accountHolder" id="accountHolder" required>
+                <div class="error-message" id="accountHolderError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Account Number*</label>
+                <input type="text" class="form-control" name="accountNumber" id="accountNumber" required>
+                <div class="error-message" id="accountNumberError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">IFSC Code*</label>
+                <input type="text" class="form-control" name="ifscCode" id="ifscCode" required>
+                <div class="error-message" id="ifscCodeError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Bank Name*</label>
+                <input type="text" class="form-control" name="bankName" id="bankName" required>
+                <div class="error-message" id="bankNameError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Branch (Optional)</label>
+                <input type="text" class="form-control" name="branch" id="branch">
+            </div>
+            
+            <div class="popup-footer">
+                <button type="button" class="btn btn-secondary" id="closeBankDetailsPopup">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submitBankDetails">Save Details</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile sidebar toggle functionality
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            
+            mobileMenuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('show');
+                sidebarOverlay.classList.toggle('show');
+            });
+            
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+            });
+            
+            sidebar.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!sidebar.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                }
+            });
+
+            // Dropdown functionality
+            const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+            
+            dropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const dropdownMenu = this.nextElementSibling;
+                    const chevron = this.querySelector('.chevron-icon');
+                    
+                    if (this.closest('.dropdown-menu')) {
+                        const parentItem = this.closest('li');
+                        const siblingDropdowns = parentItem.parentElement.querySelectorAll('.dropdown-menu');
+                        siblingDropdowns.forEach(menu => {
+                            if (menu !== dropdownMenu) {
+                                menu.classList.remove('show');
+                                const siblingChevron = menu.previousElementSibling.querySelector('.chevron-icon');
+                                if (siblingChevron) siblingChevron.classList.remove('rotate');
+                            }
+                        });
+                    } else {
+                        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                            if (menu !== dropdownMenu && !menu.closest('.show')) {
+                                menu.classList.remove('show');
+                                const siblingChevron = menu.previousElementSibling.querySelector('.chevron-icon');
+                                if (siblingChevron) siblingChevron.classList.remove('rotate');
+                            }
+                        });
+                    }
+                    
+                    if (dropdownMenu) {
+                        dropdownMenu.classList.toggle('show');
+                        if (chevron) chevron.classList.toggle('rotate');
+                    }
+                });
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.nav-menu') && !e.target.closest('.dropdown-menu')) {
+                    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                    document.querySelectorAll('.chevron-icon').forEach(chevron => {
+                        chevron.classList.remove('rotate');
+                    });
+                }
+            });
+            
+            // Bank details functionality
+            const popup = document.getElementById('popup');
+            const openPopup = document.getElementById('openPopup');
+            const closePopup = document.getElementById('closePopup');
+            const editBankDetailsBtn = document.getElementById('editBankDetails');
+            const bankDetailsForm = document.getElementById('bankDetailsForm');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Function to clear all error messages
+            function clearErrors() {
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.textContent = '';
+                    el.style.display = 'none';
+                });
+                document.querySelectorAll('.form-group').forEach(el => {
+                    el.classList.remove('error');
+                });
+            }
+            
+            // Function to show error for a specific field
+            function showError(fieldId, message) {
+                const errorElement = document.getElementById(fieldId + 'Error');
+                const formGroup = errorElement.closest('.form-group');
+                
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                formGroup.classList.add('error');
+            }
+            
+            // Function to open the popup
+            function openBankDetailsPopup() {
+                clearErrors();
+                const accountHolder = document.getElementById('displayAccountHolder').textContent;
+                const accountNumber = document.getElementById('displayAccountNumber').textContent;
+                const ifscCode = document.getElementById('displayIfscCode').textContent;
+                const bankName = document.getElementById('displayBankName').textContent;
+                
+                if (accountHolder !== 'Not provided') {
+                    document.getElementById('accountHolder').value = accountHolder;
+                }
+                if (accountNumber !== 'Not provided') {
+                    document.getElementById('accountNumber').value = accountNumber.includes('••••') ? 
+                        '' : accountNumber;
+                }
+                if (ifscCode !== 'Not provided') {
+                    document.getElementById('ifscCode').value = ifscCode;
+                }
+                if (bankName !== 'Not provided') {
+                    document.getElementById('bankName').value = bankName;
+                }
+                
+                popup.classList.add('show');
+            }
+            
+            // Open popup from sidebar menu
+            if (openPopup) {
+                openPopup.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openBankDetailsPopup();
+                });
+            }
+            
+            // Open popup from edit button
+            if (editBankDetailsBtn) {
+                editBankDetailsBtn.addEventListener('click', function() {
+                    openBankDetailsPopup();
+                });
+            }
+            
+            // Close popup
+            if (closePopup) {
+                closePopup.addEventListener('click', function() {
+                    popup.classList.remove('show');
+                    clearErrors();
+                });
+            }
+            
+            // Close popup when clicking outside
+            popup.addEventListener('click', function(e) {
+                if (e.target === popup) {
+                    popup.classList.remove('show');
+                    clearErrors();
+                }
+            });
+            
+            // Handle form submission with AJAX
+            if (bankDetailsForm) {
+                bankDetailsForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Clear previous errors
+                    clearErrors();
+                    
+                    // Disable submit button to prevent multiple submissions
+                    const submitBtn = document.getElementById('submitBtn');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    
+                    const formData = new FormData(bankDetailsForm);
+                    
+                    fetch(bankDetailsForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Update the displayed details
+                            document.getElementById('displayAccountHolder').textContent = data.account_holder || 'Not provided';
+                            document.getElementById('displayAccountNumber').textContent = data.account_number ? 
+                                '••••••••' + data.account_number.slice(-4) : 'Not provided';
+                            document.getElementById('displayIfscCode').textContent = data.ifsc_code || 'Not provided';
+                            document.getElementById('displayBankName').textContent = data.bank_name || 'Not provided';
+                            
+                            // Close the popup
+                            popup.classList.remove('show');
+                            
+                            // Show success message
+                            successMessage.style.display = 'block';
+                            setTimeout(() => {
+                                successMessage.style.display = 'none';
+                            }, 5000);
+                        } else {
+                            // Handle form errors
+                            if (data.errors) {
+                                for (const field in data.errors) {
+                                    showError(field, data.errors[field]);
+                                }
+                            } else {
+                                showError('accountHolder', data.error || 'An unknown error occurred');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showError('accountHolder', 'Failed to save bank details. Please try again.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Save Details';
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

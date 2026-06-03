@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | VacationJobs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --warning-color: #f0ad4e;
+            --danger-color: #d9534f;
+            --sidebar-width: 250px;
+            --header-height: 60px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+
+        .Background {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        .logo {
+            width: var(--sidebar-width);
+            height: 60px;
+            background-color: var(--light-color);
+            background-image: url('/static/Images/nassonline.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-bottom: 20px;
+           
+        }
+
+        .nav-container {
+            width: var(--sidebar-width);
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            height: 100vh;
+            position: fixed;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .button-container {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 101;
+        }
+
+        .firstbtn, .logout-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .firstbtn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .firstbtn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background-color: #c9302c;
+        }
+
+        /* Navigation Buttons */
+        .btn, .btn1 {
+            width: 100%;
+            padding: 12px 20px;
+            text-align: left;
+            border: none;
+            background: transparent;
+            color: var(--dark-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .btn:hover, .btn1:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .btn i, .btn1 i {
+            width: 24px;
+            text-align: center;
+        }
+
+        .chevron-icon {
+            margin-left: auto;
+            transition: var(--transition);
+        }
+
+        .btn.active .chevron-icon, #overviewLink.active .chevron-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Dropdown Styles */
+        .dropdown-content {
+            display: none;
+            background-color: #f8f9fa;
+            overflow: hidden;
+        }
+
+        .dropdown-content li a {
+            display: flex;
+            padding: 10px 20px 10px 50px;
+            text-decoration: none;
+            color: var(--dark-color);
+            transition: var(--transition);
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-content li a:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+
+        .nested-dropdown-content {
+            display: none;
+            background-color: #e9ecef;
+        }
+
+        .nested-dropdown-content li a {
+            padding-left: 70px;
+        }
+
+        /* Main Content Area */
+        .main {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            width: calc(100% - var(--sidebar-width));
+            display: none;
+        }
+        
+        #dashboard {
+            display: block; /* Always show dashboard */
+        }
+
+        .main h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Table Styles */
+        .tableclass {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        /* Alert Box */
+        .alert-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { top: -50px; opacity: 0; }
+            to { top: 20px; opacity: 1; }
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 0 0 15px;
+        }
+
+        /* Dashboard Specific Styles */
+        .dashboard-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .cards-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .card-icon i {
+            font-size: 20px;
+        }
+
+        .card-info h3 {
+            font-size: 16px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .card-info p {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .card-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .card-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: var(--dark-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .activity-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: var(--dark-color);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .activity-details p {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .alert-success {
+            background-color: var(--success-color);
+        }
+
+        .alert-error {
+            background-color: var(--danger-color);
+        }
+
+        .alert-warning {
+            background-color: var(--warning-color);
+        }
+
+        .alert-info {
+            background-color: var(--accent-color);
+        }
+
+        .close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 15px;
+        }
+
+        /* Search Container Styles */
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                width: 70px;
+                overflow: hidden;
+            }
+
+            .nav-container:hover {
+                width: var(--sidebar-width);
+            }
+
+            .btn span, .btn1 span {
+                display: none;
+            }
+
+            .nav-container:hover .btn span, 
+            .nav-container:hover .btn1 span {
+                display: inline;
+            }
+
+            .chevron-icon {
+                display: none;
+            }
+
+            .nav-container:hover .chevron-icon {
+                display: block;
+            }
+
+            .main {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+
+            .nav-container:hover ~ .main {
+                margin-left: var(--sidebar-width);
+                width: calc(100% - var(--sidebar-width));
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Messages Display -->
+    {% if messages %}
+    <div id="messages-container" style="position: fixed; top: 80px; right: 20px; z-index: 1000;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" 
+            style="min-width: 300px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            {{ message }}
+            <button type="button" class="close" onclick="this.parentElement.style.display='none'">
+                <span>&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="Background">
+        <div class="button-container">
+            <!-- <a href="{% url 'user_logins' %}"><button class="firstbtn"><i class="fas fa-user"></i> UserLogIn</button></a> -->
+            <a href="{% url 'Logout' %}"><button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></a>
+        </div>
+        
+        <div class="container">
+            <div class="nav-container">
+                <div class="logo">  </div>
+                <button class="btn" id="dropdownBtn">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <ul class="dropdown-content" id="dropdownContent">
+                    <li id="overviewLink">
+                        <a href="#">
+                            <i class="fas fa-eye"></i>
+                            <span>Overview</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </a>
+                    </li>    
+                    <div class="dropdown">
+                        <ul class="nested-dropdown-content" id="nestedDropdownContent">
+                            <li><a href="{% url 'create_task' %}"><i class="fas fa-plus-circle"></i> Task Creation</a></li>
+                            <li><a href="{% url 'task_list' %}"><i class="fas fa-list"></i> Task List</a></li>
+                            <li><a href="{% url 'admin_task_approval' %}"><i class="fas fa-check-circle"></i> Tasks Approval</a></li>
+                            <li><a href="{% url 'admin_withdrawal_requests' %}"><i class="fas fa-hand-holding-usd"></i> Withdrawal Approval</a></li>
+                            <li><a href="{% url 'Users_tree' %}"><i class="fas fa-users"></i> All Users</a></li>
+                            <li><a href="{% url 'user_management' %}"><i class="fas fa-user-cog"></i> Users Management</a></li>
+                        </ul>
+                    </div>
+                </ul>   
+                <button class="btn1" onclick="toggleSection('users')">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </button>
+                <button class="btn1" onclick="toggleSection('promotions')">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Promotions</span>
+                </button>
+                <button class="btn1" onclick="toggleSection('payout')">
+                    <i class="fas fa-wallet"></i>
+                    <span>PayOut</span>
+                </button>
+            </div>
+
+            <div id="alert-box" class="alert-box">
+                <span id="alert-message">This is a success message!</span>
+                <button class="close-btn" onclick="hideAlert()">×</button>
+            </div>
+            
+            <!-- Main Content Sections -->
+            <div class="main" id="dashboard">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h2>
+                
+                <div class="dashboard-cards">
+                    <!-- Summary Cards Row -->
+                    <div class="cards-row">
+                        <div class="card">
+                            <div class="card-icon" style="background-color: #4cc9f020;">
+                                <i class="fas fa-users" style="color: #4361ee;"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3>Referral Tree</h3>
+                                <p>{{ total_users }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'Users_tree' %}">View All</a>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon" style="background-color: #4bb54320;">
+                                <i class="fas fa-check-circle" style="color: #4bb543;"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3>Active Users</h3>
+                                <p>{{ active_users }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="#">View Details</a>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon" style="background-color: #f0ad4e20;">
+                                <i class="fas fa-tasks" style="color: #f0ad4e;"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3>Pending Tasks</h3>
+                                <p>{{ pending_tasks }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'admin_task_approval' %}">Review</a>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon" style="background-color: #d9534f20;">
+                                <i class="fas fa-hand-holding-usd" style="color: #d9534f;"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3>Withdrawal Requests</h3>
+                                <p>{{ withdrawal_requests }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'admin_withdrawal_requests' %}">Process</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts Row -->
+                    <div class="charts-row">
+                        <div class="chart-card">
+                            <h3><i class="fas fa-chart-line"></i> User Growth</h3>
+                            <div class="chart-container">
+                                <canvas id="userGrowthChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <h3><i class="fas fa-money-bill-wave"></i> Earnings Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="earningsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="activity-card">
+                        <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                        <div class="activity-list">
+                            {% for activity in recent_activities %}
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    {% if activity.type == 'login' %}
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    {% elif activity.type == 'task' %}
+                                    <i class="fas fa-tasks"></i>
+                                    {% elif activity.type == 'withdrawal' %}
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    {% else %}
+                                    <i class="fas fa-info-circle"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="activity-details">
+                                    <p>{{ activity.description }}</p>
+                                    <span class="activity-time">{{ activity.timestamp|timesince }} ago</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main" id="users">
+                <h2><i class="fas fa-users"></i> Users Management</h2>
+                
+                <!-- Search Container -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" id="userSearch" class="search-input" placeholder="Search users..." onkeyup="searchUsers()">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <select class="filter-select" id="searchFilter">
+                        <option value="all">All Fields</option>
+                        <option value="id">ID</option>
+                        <option value="name">Name</option>
+                        <option value="username">Username</option>
+                        <option value="email">Email</option>
+                        <option value="phone">Phone</option>
+                        <option value="reference">Reference</option>
+                    </select>
+                </div>
+                
+                <div class="tableclass">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Reference</th>
+                                <th>Pending ₹</th>
+                                <th>Approved ₹</th>
+                                <th>Total ₹</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.register.first_name }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.register.email }}</td>
+                                <td>{{ user.register.phone }}</td>
+                                <td>{{ user.referral.parent.user.username }}</td>
+                                <td>₹{{ user.wallet.wallet_balance }}</td>
+                                <td>₹{{ user.wallet.paid_amount }}</td>
+                                <td>₹{{ user.wallet.total_earnings }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div> 
+
+            <div class="main" id="promotions">
+                <h2><i class="fas fa-bullhorn"></i> Promotions</h2>
+                <div class="tableclass">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Resource</th>
+                                <th>File</th>
+                                <th>Statics</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+            <div class="main" id="payout">
+                <h2><i class="fas fa-wallet"></i> PayOut Requests</h2>
+                <div class="tableclass">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for withdraw in withdraws %}
+                            <tr>
+                                <td>{{ withdraw.user.id }}</td>
+                                <td>{{ withdraw.user.register.first_name }}</td>
+                                <td>{{ withdraw.user.username }}</td>
+                                <td>₹{{ withdraw.amount}}</td>
+                                <td>
+                                    <span class="status-badge {{ withdraw.status|lower }}">
+                                        {{ withdraw.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>   
+    </div>
+
+    <script>
+        // Toggle the main dropdown and dashboard content when "Dashboard" is clicked
+        document.getElementById("dropdownBtn").addEventListener("click", function (event) {
+            event.stopPropagation();
+            const dropdownContent = document.getElementById("dropdownContent");
+            const dashboardSection = document.getElementById("dashboard");
+            
+            // Toggle dropdown visibility
+            dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+            this.classList.toggle("active");
+            
+            // Show dashboard and hide other sections when clicking Dashboard button
+            if (dropdownContent.style.display === "block") {
+                document.querySelectorAll(".main").forEach((section) => {
+                    section.style.display = section.id === "dashboard" ? "block" : "none";
+                });
+            }
+        });
+
+        // Toggle the nested dropdown when "Overview" is clicked
+        document.getElementById("overviewLink").addEventListener("click", function (event) {
+            event.preventDefault(); 
+            event.stopPropagation(); 
+            const nestedDropdownContent = document.getElementById("nestedDropdownContent");
+            nestedDropdownContent.style.display = nestedDropdownContent.style.display === "block" ? "none" : "block";
+            const chevronIcon = this.querySelector(".chevron-icon");
+            chevronIcon.classList.toggle("active");
+            this.classList.toggle("active");
+        });
+
+        // Close dropdowns when clicking outside
+        window.addEventListener("click", function (event) {
+            const dropdownContent = document.getElementById("dropdownContent");
+            const dropdownBtn = document.getElementById("dropdownBtn");
+            const overviewLink = document.getElementById("overviewLink");
+            const nestedDropdownContent = document.getElementById("nestedDropdownContent");
+
+            if (!dropdownBtn.contains(event.target)) {
+                dropdownContent.style.display = "none";
+                dropdownBtn.classList.remove("active");
+            }
+
+            if (!overviewLink.contains(event.target)) {
+                nestedDropdownContent.style.display = "none";
+                overviewLink.querySelector(".chevron-icon").classList.remove("active");
+                overviewLink.classList.remove("active");
+            }
+        });
+
+        function toggleSection(sectionId) {
+            // Hide all sections except dashboard
+            document.querySelectorAll(".main").forEach((section) => {
+                section.style.display = section.id === sectionId ? "block" : "none";
+            });
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // User Growth Chart
+            const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+            const userGrowthChart = new Chart(userGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'New Users',
+                        data: [12, 19, 15, 27, 34, 42, 38, 51, 49, 60, 72, 85],
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        borderColor: 'rgba(67, 97, 238, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Earnings Distribution Chart
+            const earningsCtx = document.getElementById('earningsChart').getContext('2d');
+            const earningsChart = new Chart(earningsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Task Earnings', 'Referral Earnings', 'Bonuses'],
+                    datasets: [{
+                        data: [65, 25, 10],
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.8)',
+                            'rgba(76, 201, 240, 0.8)',
+                            'rgba(63, 55, 201, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // Alert messages
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('alert-box');
+            const alertMessage = document.getElementById('alert-message');
+
+            alertMessage.textContent = message;
+            alertBox.style.display = 'flex';
+            
+            // Set color based on type
+            if (type === 'success') {
+                alertBox.style.backgroundColor = '#4bb543';
+            } else if (type === 'warning') {
+                alertBox.style.backgroundColor = '#f0ad4e';
+            } else if (type === 'error') {
+                alertBox.style.backgroundColor = '#d9534f';
+            }
+
+            setTimeout(() => {
+                hideAlert();
+            }, 3000);
+        }
+
+        function hideAlert() {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.style.display = 'none';
+        }
+
+        // User search functionality
+        function searchUsers() {
+            // Get input value and filter
+            const input = document.getElementById('userSearch');
+            const filter = input.value.toUpperCase();
+            const filterType = document.getElementById('searchFilter').value;
+            const table = document.getElementById('usersTable');
+            const tr = table.getElementsByTagName('tr');
+            
+            // Loop through all table rows
+            for (let i = 1; i < tr.length; i++) {
+                let found = false;
+                const tds = tr[i].getElementsByTagName('td');
+                
+                if (filterType === 'all') {
+                    // Search all columns
+                    for (let j = 0; j < tds.length; j++) {
+                        const td = tds[j];
+                        if (td) {
+                            const txtValue = td.textContent || td.innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // Search specific column based on filter
+                    let columnIndex = 0;
+                    switch(filterType) {
+                        case 'id': columnIndex = 0; break;
+                        case 'name': columnIndex = 1; break;
+                        case 'username': columnIndex = 2; break;
+                        case 'email': columnIndex = 3; break;
+                        case 'phone': columnIndex = 4; break;
+                        case 'reference': columnIndex = 5; break;
+                    }
+                    
+                    if (tds[columnIndex]) {
+                        const txtValue = tds[columnIndex].textContent || tds[columnIndex].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                        }
+                    }
+                }
+                
+                // Show/hide row based on search result
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+
+        // Initialize charts when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            
+            // Show alert if there's a message
+            const message = "{{ message|escapejs }}"; 
+            if (message) {
+                showAlert(message);
+            }
+        });
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.getElementById('messages-container');
+            if (messages) {
+                messages.style.transition = 'opacity 0.5s ease';
+                messages.style.opacity = '0';
+                setTimeout(() => messages.remove(), 500);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

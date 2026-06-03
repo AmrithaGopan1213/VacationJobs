@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Center</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .support-page-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2rem;
+        }
+
+        .support-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        h2, h3 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: #fff;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1em;
+        }
+
+        textarea,
+        select,
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .reviews {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .review-item {
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        .modal form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal form label {
+            margin: 10px 0 5px;
+        }
+
+        .modal form button {
+            margin-top: 20px;
+        }
+
+        /* Responsive design */
+        @media screen and (max-width: 600px) {
+            .support-page-container {
+                padding: 15px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                font-size: 1rem;
+                padding: 12px;
+            }
+
+            .modal-content {
+                margin: 20% auto;
+                padding: 15px;
+            }
+
+            textarea,
+            select,
+            input {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="support-page-container">
+        <h1>Support Center</h1>
+
+        <!-- Reviews Section -->
+        <section class="support-section">
+            <h2 class="h2-title">Reviews</h2>
+            <p>Read what other users have to say about tasks and the platform:</p>
+            <div class="reviews">
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review-item">
+                            <p><strong>{{ review.user.username }}</strong>: "{{ review.description }}"</p>
+                            <p>Rating: {{ review.subject|slice:"14:" }} ★</p>
+                            <p><small>Submitted on {{ review.created_at|date:"F j, Y, g:i a" }}</small></p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No reviews yet. Be the first to leave a review!</p>
+                {% endif %}
+            </div>
+            <button class="btn" onclick="openModal()">Submit Your Review</button>
+        </section>
+
+        <!-- Rules & Guidelines Section -->
+        <section class="support-section">
+            <h2>Rules & Guidelines</h2>
+            <h3>Task Submission Guidelines</h3>
+            <ul>
+                <li>Upload only accepted file formats (e.g., PDF, JPG).</li>
+                <li>Provide a detailed description of how you completed the task.</li>
+                <li>Make sure to submit before the task deadline.</li>
+            </ul>
+        </section>
+
+        <!-- Payment Regulations Section -->
+        <section class="support-section">
+            <h2>Payment Regulations</h2>
+            <h3>Payout Structure</h3>
+            <ul>
+                <li>Payments will be processed on a weekly basis.</li>
+                <li>Minimum withdrawal amount: $50</li>
+                <li>Payments are sent via bank transfer, PayPal, etc.</li>
+            </ul>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="support-section">
+            <h2>Frequently Asked Questions (FAQ)</h2>
+            <h3>How do I submit proof for a completed task?</h3>
+            <p>Go to the task page, and click on the "Submit Proof" button. Upload your proof file and provide a description.</p>
+        </section>
+
+        <!-- Contact Support Section -->
+        <section class="support-section">
+            <h2>Contact Support</h2>
+            <form action="{% url 'index' %}" method="POST">
+                {% csrf_token %}
+                <label for="message">Message:</label>
+                <textarea name="message" id="message" rows="5" required></textarea>
+                <button type="submit" class="btn">Submit Message</button>
+            </form>
+        </section>
+
+        <!-- Tutorials / Guides Section -->
+        <section class="support-section">
+            <h2>Tutorials & Guides</h2>
+            <p>Get started with our platform by reading these helpful guides:</p>
+            <ul>
+                <li><a href="{% url 'Account' %}">How to Create a Task</a></li>
+                <li><a href="{% url 'Account' %}">How to Submit Proof</a></li>
+                <li><a href="{% url 'Account' %}">How to Withdraw Earnings</a></li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Submit Your Review</h2>
+            <form action="{% url 'support' %}" method="POST">
+                {% csrf_token %}
+                <label for="review">Your Review:</label>
+                <textarea id="review" name="review" rows="4" required></textarea>
+                
+                <label for="rating">Rating:</label>
+                <select id="rating" name="rating" required>
+                    <option value="">-- Select Rating --</option>
+                    <option value="5">★★★★★</option>
+                    <option value="4">★★★★☆</option>
+                    <option value="3">★★★☆☆</option>
+                    <option value="2">★★☆☆☆</option>
+                    <option value="1">★☆☆☆☆</option>
+                </select>
+                
+                <button type="submit" class="btn">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById("feedbackModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("feedbackModal").style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("feedbackModal");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

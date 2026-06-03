@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create Task</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 30px;
+        }
+        .form-control, .form-select, .form-check-input {
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+        #back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            border: 1px solid #007bff;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        #back-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .filter-section input, .filter-section select {
+            flex: 1 1 200px;
+            min-width: 150px;
+        }
+        #users-container {
+            display: none;
+        }
+        .alert-message {
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #filtered-users {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+        .spinner-border {
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        .dropdown-toggle::after {
+            display: none;
+        }
+        .dropdown-menu {
+            min-width: 200px;
+        }
+        @media (max-width: 768px) {
+            #back-button {
+                position: static;
+                display: inline-block;
+                margin-bottom: 20px;
+                width: auto;
+            }
+            .filter-section {
+                gap: 10px;
+            }
+            .card {
+                padding: 20px;
+            }
+        }
+        @media (max-width: 576px) {
+            .filter-section input, .filter-section select {
+                flex: 1 1 100%;
+            }
+            #filtered-users {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-5">
+        <h1>Create Task</h1>
+        <a href="{% url 'admin_dashboard' %}" id="back-button" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        </a>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <form method="POST" class="card">
+                    {% csrf_token %}
+                    
+                    <!-- Basic Task Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_title" class="form-label fw-bold">Task Title*</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger mt-1">{{ form.title.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_task_url" class="form-label fw-bold">Task URL</label>
+                            {{ form.task_url }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="id_description" class="form-label fw-bold">Description*</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger mt-1">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Financial Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_commission_per_task" class="form-label fw-bold">Commission Per Task*</label>
+                            {{ form.commission_per_task }}
+                            {% if form.commission_per_task.errors %}
+                                <div class="text-danger mt-1">{{ form.commission_per_task.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_payout" class="form-label fw-bold">Payout (20% of Commission)</label>
+                            {{ form.payout }}
+                        </div>
+                    </div>
+                    
+                    <!-- Date Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_deadline" class="form-label fw-bold">Deadline*</label>
+                            {{ form.deadline }}
+                            {% if form.deadline.errors %}
+                                <div class="text-danger mt-1">{{ form.deadline.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_scheduled_at" class="form-label fw-bold">Scheduled At</label>
+                            {{ form.scheduled_at }}
+                        </div>
+                    </div>
+                    
+                    <!-- Users Assignment Section -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Assign Users*</label>
+                        <p class="text-muted mb-3">Filter and select users to assign this task to</p>
+                        
+                        <!-- Filter Controls -->
+                        <div class="filter-section">
+                            <div class="w-100">
+                                <label class="form-label">Filter by:</label>
+                            </div>
+                            <input type="text" name="country" id="country" placeholder="Country" class="form-control">
+                            <input type="text" name="state" id="state" placeholder="State" class="form-control">
+                            <input type="text" name="language" id="language" placeholder="Language" class="form-control">
+                            <input type="text" name="hobby" id="hobby" placeholder="Hobby" class="form-control">
+                            <select name="gender" id="gender" class="form-select">
+                                <option value="">All Genders</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">All Statuses</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            <input type="text" name="qualification" id="qualification" placeholder="Qualification" class="form-control">
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button type="button" class="btn btn-primary" id="filter-button">
+                                <i class="fas fa-filter me-2"></i>Filter Users
+                            </button>
+                            <button type="button" class="btn btn-success" id="selectAll">
+                                <i class="fas fa-check-circle me-2"></i>Select All
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="deselectAll" style="display:none;">
+                                <i class="fas fa-times-circle me-2"></i>Deselect All
+                            </button>
+                        </div>
+                        
+                        <!-- Status Message -->
+                        <div class="alert-message alert-success" id="selectionMessage"></div>
+                        
+                        <!-- Hidden users container (for form submission) -->
+                        <div id="users-container">
+                            {{ form.users_assigned }}
+                        </div>
+                        
+                        <!-- Filtered users display -->
+                        <div id="filtered-users"></div>
+                    </div>
+                    
+                    <!-- Additional Task Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_proof" class="form-label fw-bold">Proof Requirements</label>
+                            {{ form.proof }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_workers_limit" class="form-label fw-bold">Workers Limit</label>
+                            {{ form.workers_limit }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_status" class="form-label fw-bold">Status*</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_created_by" class="form-label fw-bold">Created By</label>
+                            {{ form.created_by }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>Create Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Main JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeForm();
+            setupEventListeners();
+        });
+        
+        function initializeForm() {
+            const commissionField = document.querySelector('[name="commission_per_task"]');
+            const payoutField = document.querySelector('[name="payout"]');
+            
+            if (commissionField && payoutField) {
+                commissionField.addEventListener('change', function() {
+                    const commission = parseFloat(this.value) || 0;
+                    payoutField.value = (commission * 0.2).toFixed(2);
+                });
+                
+                if (commissionField.value) {
+                    payoutField.value = (parseFloat(commissionField.value) * 0.2).toFixed(2);
+                }
+            }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('filter-button').addEventListener('click', filterUsers);
+            document.getElementById('selectAll').addEventListener('click', selectAllUsers);
+            document.getElementById('deselectAll').addEventListener('click', deselectAllUsers);
+        }
+        
+        function filterUsers() {
+            const filters = {
+                country: document.getElementById('country').value,
+                state: document.getElementById('state').value,
+                language: document.getElementById('language').value,
+                hobby: document.getElementById('hobby').value,
+                gender: document.getElementById('gender').value,
+                status: document.getElementById('status').value,
+                qualification: document.getElementById('qualification').value
+            };
+            
+            deselectAllUsers();
+            
+            const filterButton = document.getElementById('filter-button');
+            const originalText = filterButton.innerHTML;
+            filterButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Filtering...';
+            filterButton.disabled = true;
+            
+            fetch('/filter-users/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(filters),
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                const filteredUsersDiv = document.getElementById('filtered-users');
+                
+                if (data.error) throw new Error(data.error);
+                
+                if (data.users && data.users.length > 0) {
+                    let userHtml = `
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><input type="checkbox" id="select-all-filtered" checked></th>
+                                    <th>Name</th>
+                                    <th>Country</th>
+                                    <th>Hobby</th>
+                                    <th>Gender</th>
+                                    <th>Status</th>
+                                    <th>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                                    id="userActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-cog"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="userActionsDropdown">
+                                                <li><a class="dropdown-item" href="#" onclick="exportSelectedUsers()">
+                                                    <i class="fas fa-download me-2"></i>Export Selected</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="filterBySelected('active')">
+                                                    <i class="fas fa-check-circle me-2"></i>Show Active Only</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="filterBySelected('inactive')">
+                                                    <i class="fas fa-times-circle me-2"></i>Show Inactive Only</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item" href="#" onclick="clearAllFilters()">
+                                                    <i class="fas fa-filter-circle-xmark me-2"></i>Clear All Filters</a></li>
+                                            </ul>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                    
+                    data.users.forEach(user => {
+                        userHtml += `
+                        <tr>
+                            <td><input type="checkbox" class="form-check-input filtered-user-checkbox" 
+                                       data-user-id="${user.id}" checked onchange="syncUserSelection(this)"></td>
+                            <td>${user.name}</td>
+                            <td>${user.country || '-'}</td>
+                            <td>${user.hobby || '-'}</td>
+                            <td>${user.gender || '-'}</td>
+                            <td>${user.status || '-'}</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                            id="userRowDropdown${user.id}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="userRowDropdown${user.id}">
+                                        <li><a class="dropdown-item" href="#" onclick="viewUserDetails('${user.id}')">
+                                            <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="messageUser('${user.id}')">
+                                            <i class="fas fa-envelope me-2"></i>Send Message</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="removeUser('${user.id}')">
+                                            <i class="fas fa-user-minus me-2"></i>Remove</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>`;
+                        
+                        let hiddenCheckbox = document.querySelector(`#users-container input[value="${user.id}"]`);
+                        if (!hiddenCheckbox) {
+                            const container = document.getElementById('users-container');
+                            hiddenCheckbox = document.createElement('input');
+                            hiddenCheckbox.type = 'checkbox';
+                            hiddenCheckbox.name = 'users_assigned';
+                            hiddenCheckbox.value = user.id;
+                            hiddenCheckbox.className = 'form-check-input';
+                            container.appendChild(hiddenCheckbox);
+                        }
+                        hiddenCheckbox.checked = true;
+                    });
+                    
+                    userHtml += `</tbody></table></div>`;
+                    filteredUsersDiv.innerHTML = userHtml;
+                    filteredUsersDiv.style.display = 'block';
+                    
+                    document.getElementById('select-all-filtered').onclick = function() {
+                        toggleAllFilteredUsers(this);
+                    };
+                    
+                    updateSelectionCount(data.users.length);
+                    
+                    setTimeout(() => {
+                        filteredUsersDiv.style.display = 'none';
+                    }, 3000);
+                    
+                } else {
+                    filteredUsersDiv.style.display = 'none';
+                    showMessage('No users match the selected filters', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Error filtering users: ' + error.message, 'danger');
+            })
+            .finally(() => {
+                filterButton.innerHTML = originalText;
+                filterButton.disabled = false;
+            });
+        }
+        
+        function toggleAllFilteredUsers(checkbox) {
+            const filteredCheckboxes = document.querySelectorAll('.filtered-user-checkbox');
+            filteredCheckboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+                syncUserSelection(cb);
+            });
+            
+            document.getElementById('selectAll').style.display = checkbox.checked ? 'none' : 'inline-block';
+            document.getElementById('deselectAll').style.display = checkbox.checked ? 'inline-block' : 'none';
+        }
+        
+        function syncUserSelection(checkbox) {
+            const userId = checkbox.dataset.userId;
+            let hiddenCheckbox = document.querySelector(`#users-container input[value="${userId}"]`);
+            
+            if (!hiddenCheckbox) {
+                const container = document.getElementById('users-container');
+                hiddenCheckbox = document.createElement('input');
+                hiddenCheckbox.type = 'checkbox';
+                hiddenCheckbox.name = 'users_assigned';
+                hiddenCheckbox.value = userId;
+                hiddenCheckbox.className = 'form-check-input';
+                container.appendChild(hiddenCheckbox);
+            }
+            
+            hiddenCheckbox.checked = checkbox.checked;
+            updateSelectionCount();
+        }
+        
+        function selectAllUsers() {
+            const hiddenCheckboxes = document.querySelectorAll('#users-container input[type="checkbox"]');
+            hiddenCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            
+            const filteredCheckboxes = document.querySelectorAll('.filtered-user-checkbox');
+            filteredCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            
+            showMessage('All users have been selected!', 'success');
+            document.getElementById('selectAll').style.display = 'none';
+            document.getElementById('deselectAll').style.display = 'inline-block';
+        }
+        
+        function deselectAllUsers() {
+            const hiddenCheckboxes = document.querySelectorAll('#users-container input[type="checkbox"]');
+            hiddenCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            const filteredCheckboxes = document.querySelectorAll('.filtered-user-checkbox');
+            filteredCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            showMessage('All users have been deselected!', 'success');
+            document.getElementById('deselectAll').style.display = 'none';
+            document.getElementById('selectAll').style.display = 'inline-block';
+        }
+        
+        function updateSelectionCount(count) {
+            const selectedCount = count || document.querySelectorAll('#users-container input[type="checkbox"]:checked').length;
+            showMessage(`${selectedCount} users selected`, 'success');
+        }
+        
+        function showMessage(text, type) {
+            const message = document.getElementById('selectionMessage');
+            message.textContent = text;
+            message.className = `alert-message alert-${type}`;
+            message.style.display = 'block';
+            
+            if (!text.includes('users selected')) {
+                setTimeout(() => message.style.display = 'none', 3000);
+            }
+        }
+        
+        // New functions for dropdown actions
+        function exportSelectedUsers() {
+            const selectedUsers = Array.from(document.querySelectorAll('#users-container input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+            
+            if (selectedUsers.length === 0) {
+                showMessage('No users selected to export', 'danger');
+                return;
+            }
+            
+            showMessage(`Preparing export for ${selectedUsers.length} users...`, 'success');
+            console.log('Exporting users:', selectedUsers);
+        }
+        
+        function filterBySelected(status) {
+            document.getElementById('status').value = status;
+            filterUsers();
+        }
+        
+        function clearAllFilters() {
+            document.getElementById('country').value = '';
+            document.getElementById('state').value = '';
+            document.getElementById('language').value = '';
+            document.getElementById('hobby').value = '';
+            document.getElementById('gender').value = '';
+            document.getElementById('status').value = '';
+            document.getElementById('qualification').value = '';
+            filterUsers();
+        }
+        
+        function viewUserDetails(userId) {
+            showMessage(`Viewing details for user ${userId}`, 'success');
+            console.log('View user details:', userId);
+        }
+        
+        function messageUser(userId) {
+            showMessage(`Messaging user ${userId}`, 'success');
+            console.log('Message user:', userId);
+        }
+        
+        function removeUser(userId) {
+            const checkbox = document.querySelector(`.filtered-user-checkbox[data-user-id="${userId}"]`);
+            if (checkbox) {
+                checkbox.checked = false;
+                syncUserSelection(checkbox);
+            }
+            showMessage(`User ${userId} removed from selection`, 'success');
+        }
+    </script>
+</body>
+</html> 

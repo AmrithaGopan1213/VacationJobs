@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Logins</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fc;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .table {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th, .table td {
+            text-align: center;
+            padding: 15px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-warning {
+            background-color: #f0ad4e;
+            color: white;
+            border-radius: 5px;
+            padding: 8px 15px;
+        }
+
+        .btn-warning:hover {
+            background-color: #ec971f;
+        }
+
+        .btn-warning:active {
+            background-color: #d58512;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .table tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .table td, .table th {
+            border: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .table th, .table td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .btn-warning {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <h2>User Management</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in verified_users %}
+                        <tr>
+                            <td>{{ profile.user.username }}</td>
+                            <td>{{ profile.email }}</td>
+                            <td>{% if profile.is_verified %}Verified{% else %}Not Verified{% endif %}</td>
+                            <td>
+                                <a href="{% url 'impersonate_user' profile.user.id %}" class="btn btn-warning">Impersonate</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

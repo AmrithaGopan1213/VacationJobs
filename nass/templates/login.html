@@ -1,0 +1,309 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VacationJobs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/static/Images/Image4.jpeg');
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            flex-direction: column;
+            position: relative;
+            transition: filter 0.5s ease;
+            z-index: 1;
+            filter: blur(0);
+        }
+
+        .container {
+            background-color: rgba(229, 221, 66, 0.6);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgb(0, 0, 0.1);
+            width: 90%;
+            max-width: 350px;
+            border: 2px solid white;
+            margin: 20px 0;
+        }
+
+        .container a {
+            color: rgb(85, 9, 9);
+            text-decoration: none;
+        }
+
+        .container a:hover {
+            text-decoration: underline;
+        }
+
+        .container h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: rgb(65, 76, 225);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: rgb(28, 28, 90);
+        }
+
+        /* Error Popup Styles */
+        .error-popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #dc3545;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+            max-width: 90%;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                top: -50px;
+                opacity: 0;
+            }
+            to {
+                top: 20px;
+                opacity: 1;
+            }
+        }
+
+        .error-popup.show {
+            display: block;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* Success Popup Styles */
+        .success-popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+            max-width: 90%;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .success-popup.show {
+            display: block;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                width: 85%;
+            }
+            
+            .container h1 {
+                font-size: 1.3rem;
+            }
+            
+            input[type="text"],
+            input[type="email"],
+            input[type="password"] {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+            
+            button {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .container p, .container a {
+                font-size: 0.9rem;
+            }
+
+            .error-popup, .success-popup {
+                width: 90%;
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .container {
+                padding: 10px;
+                width: 90%;
+            }
+            
+            .container h1 {
+                font-size: 1.2rem;
+            }
+            
+            input[type="text"],
+            input[type="email"],
+            input[type="password"] {
+                padding: 7px;
+                font-size: 0.85rem;
+            }
+            
+            button {
+                padding: 8px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* For landscape orientation on mobile devices */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                height: auto;
+                padding: 20px 0;
+            }
+            
+            .container {
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Error Popup -->
+    <div id="error-popup" class="error-popup">
+        <span id="error-message"></span>
+        <span class="close-btn" onclick="document.getElementById('error-popup').classList.remove('show')">&times;</span>
+    </div>
+
+    <!-- Success Popup -->
+    <div id="success-popup" class="success-popup">
+        <span id="success-message"></span>
+        <span class="close-btn" onclick="document.getElementById('success-popup').classList.remove('show')">&times;</span>
+    </div>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    // Display the success popup message
+                    const successPopup = document.getElementById('success-popup');
+                    document.getElementById('success-message').textContent = '{{ message }}';
+                    successPopup.classList.add('show');
+
+                    // Hide the popup after 4.5 seconds
+                    setTimeout(() => {
+                        successPopup.classList.remove('show');
+                    }, 4500);
+                </script>
+            {% endfor %}
+        {% endif %}
+        
+        {% if error %}
+            <script>
+                // Display the error popup when page loads
+                document.addEventListener('DOMContentLoaded', function() {
+                    const errorPopup = document.getElementById('error-popup');
+                    document.getElementById('error-message').textContent = '{{ error }}';
+                    errorPopup.classList.add('show');
+
+                    // Hide the popup after 4.5 seconds
+                    setTimeout(() => {
+                        errorPopup.classList.remove('show');
+                    }, 4500);
+                });
+            </script>
+        {% endif %}
+        
+        <h1>LOGIN</h1>
+        <p>Don't have an account? <a href="{% url 'register_view' %}">Click here to register</a></p>
+        <form id="login-form" action="" method="POST">
+            {% csrf_token %}
+            <input type="text" placeholder="Enter the username" id="username" name="username" required>
+            <input type="password" placeholder="Enter the password" id="password" name="password" required>
+            <button type="submit">LOGIN</button>
+        </form>
+        <a href="/forgot-password/">Forgot Password?</a>
+    </div>
+
+    <script>
+        // Function to show error popup
+        function showError(message) {
+            const errorPopup = document.getElementById('error-popup');
+            document.getElementById('error-message').textContent = message;
+            errorPopup.classList.add('show');
+
+            // Hide the popup after 4.5 seconds
+            setTimeout(() => {
+                errorPopup.classList.remove('show');
+            }, 4500);
+        }
+
+        // Function to show success popup
+        function showSuccess(message) {
+            const successPopup = document.getElementById('success-popup');
+            document.getElementById('success-message').textContent = message;
+            successPopup.classList.add('show');
+
+            // Hide the popup after 4.5 seconds
+            setTimeout(() => {
+                successPopup.classList.remove('show');
+            }, 4500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        .go-back-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+        .wallet-card {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .wallet-card h4 {
+            font-weight: 600;
+        }
+        .withdraw-btn {
+            background-color: white;
+            color: #6e8efb;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .withdraw-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .bank-warning {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Welcome, {{ user.username }}</h1>
+        <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary go-back-btn">
+            <i class="fa fa-arrow-left"></i> Go Back</a>
+        
+        <!-- Bank Details Warning -->
+        {% if not has_bank_details %}
+        <div class="bank-warning">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                <div>
+                    <h5 class="mb-1">Bank Details Required</h5>
+                    <p class="mb-0">Please add your bank details to request withdrawals.</p>
+                </div>
+                <a href="{% url 'bank_details' %}" class="btn btn-light ms-auto">
+                    <i class="fas fa-plus me-2"></i>Add Bank Details
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Wallet Section -->
+        <div class="card mb-4 wallet-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4><i class="fas fa-wallet me-2"></i> Wallet Balance</h4>
+                        <h2 class="mt-2">₹{{ wallet.wallet_balance }}</h2>
+                        <p class="mb-0"><small>Minimum withdrawal: ₹100</small></p>
+                    </div>
+                    <button class="btn withdraw-btn" onclick="ConfirmWithdrawal()">Request Withdrawal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Section -->
+        <h2>Your Tasks</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Payout</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in assignments %}
+                <tr>
+                    <td>{{ assignment.task.title }}</td>
+                    <td>{{ assignment.task.description }}</td>
+                    <td>₹{{ assignment.task.payout }}</td>
+                    <td>{{ assignment.task.deadline }}</td>
+                    <td>
+                        {% if assignment.submission_status == 'pending' %}
+                            <span class="badge bg-primary">Pending</span>
+                        {% elif assignment.submission_status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% elif assignment.submission_status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif assignment.submission_status == 'in_progress' %}
+                            <span class="badge bg-warning">In Progress</span>
+                        {% elif assignment.submission_status == 'pending_review' %}
+                            <span class="badge bg-info">Pending Review</span>
+                        {% elif assignment.submission_status == 'paid' %}
+                            <span class="badge bg-success">Paid</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No tasks assigned yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function ConfirmWithdrawal() {
+            const walletBalance = parseFloat("{{ wallet.wallet_balance }}");
+            const minimumWithdrawal = 100;
+            const hasBankDetails = {% if has_bank_details %}true{% else %}false{% endif %};
+            
+            // Check if user has bank details
+            if (!hasBankDetails) {
+                Swal.fire({
+                    title: 'Bank Details Required',
+                    html: `You need to add your bank details before requesting withdrawal.<br><br>
+                           <div class="text-start">
+                           <strong>Required Information:</strong><br>
+                           • Account Holder Name<br>
+                           • Account Number<br>
+                           • IFSC Code<br>
+                           • Bank Name<br>
+                           </div>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#6e8efb',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '<i class="fas fa-plus me-2"></i>Add Bank Details',
+                    cancelButtonText: 'Cancel',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{% url 'bank_details' %}";
+                    }
+                });
+                return;
+            }
+            
+            // Check minimum balance
+            if (walletBalance < minimumWithdrawal) {
+                Swal.fire({
+                    title: 'Insufficient Balance',
+                    html: `You need at least <b>₹${minimumWithdrawal}</b> to withdraw.<br>Your current balance is <b>₹${walletBalance}</b>.`,
+                    icon: 'warning',
+                    confirmButtonText: 'Okay',
+                    confirmButtonColor: '#6e8efb',
+                });
+                return;
+            }
+            
+            // Proceed with withdrawal
+            Swal.fire({
+                title: 'Confirm Withdrawal',
+                html: `You are about to withdraw <b>₹${walletBalance}</b> from your wallet.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#6e8efb',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, withdraw',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            window.location.href = "{% url 'Request_withdrawal' %}";
+                            resolve();
+                        }, 1500);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // This will show after the redirect happens
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Your withdrawal request has been submitted.',
+                        icon: 'success',
+                        confirmButtonColor: '#6e8efb'
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

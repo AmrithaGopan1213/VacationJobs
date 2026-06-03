@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* display: flex;
+            justify-content: center;
+            align-items: center; 
+            height: 100vh;  */
+        }
+        .Usersbackground {
+            background-image: url('/static/Images/pexels-kampus.jpg'); /* Correct path */
+            background-size: cover; /* Ensure it covers the entire container */
+            background-repeat: no-repeat; /* Prevent repetition */
+            background-position: center center; /* Center the image */
+            width: 100%;
+            height:100vh;
+            position: fixed; /* Keep it fixed to the viewport */
+            top: 0;
+            left: 0;
+            z-index: -1; /* Place it behind other content */
+        }
+        
+        h1{
+            color:black;
+            margin: 0px;
+            text-align: center;
+            left: 50%;
+            position: fixed; /* Set content div position to absolute */
+            top: 40px;
+            transform: translateX(-50%);
+            z-index: 1; /* Ensure it stays above other content */
+        }
+        .container{
+            /* background-color: #acdfc1; */
+            width:300px;
+            height: 100%;
+            /* padding: 20px; */
+            margin: 150px auto; /* Centers the container horizontally */
+            color: black;
+            border-color: whitesmoke;
+            z-index: 1; /* Ensure it's above the background */
+            position: absolute; /* Allows manual positioning */
+            top: -150px; /* Distance from the top of the page */
+        }
+        .applogo {
+            background-image: url('/static/Images/nassonline.jpg'); /* Replace with your logo path */
+            background-size: contain; /* Ensures the logo fits inside the div */
+            background-repeat: no-repeat; /* Prevents the logo from repeating */
+            width: 45%; /* Adjust the width of the logo */
+            height: 10%; /* Adjust the height of the logo */
+            position: absolute; /* Absolute positioning inside .background-container */
+            top: 3%; /* 50px margin from the top */
+            left: 25%; /* 10% margin from the left side of the container */
+        }
+        .nav-container {
+            position: absolute;
+            top: 90px; /* 20px from the top of the container */
+            left: 150%; /* Center horizontally */
+            transform: translateX(-50%); /* Shift the button by half its width for perfect centering */
+            display:flex;/* Use flexbox to arrange items horizontally */
+            gap: 25px; /* Space between the buttons */
+            flex-direction: row; /* Stack items vertically */
+            align-items: center; /* Center the buttons */
+        }
+        .btn {
+            background-color: rgb(0, 0, 0); /* Blue background */
+            border-radius: 8px; /* Remove borders */
+            color: white; /* White text */
+            padding: 12px 16px; /* Some padding */
+            font-size: 16px; /* Set a font size */
+            cursor: pointer; /* Mouse pointer on hover */
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Center the text inside the button */
+            width: 250px; /* Set a fixed width for the button */
+            margin-left: 35px;
+            position: relative; /* Position relative for dropdown positioning */
+        }
+        .btn i {
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: rgb(35, 76, 63);
+        }
+        .chevron-icon {
+            width: 18px;
+            height: 18px;
+            margin-left: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease; /* Smooth rotation animation */
+        }
+        .dropdown-content{
+                display: none; /* Initially hide the dropdown */
+                position: absolute;
+                align-items: center;
+                background-color:white; /* Dropdown background */
+                min-width: 80px;
+                box-shadow: 0px 8px 16px rgba(0,0,0,0.2); /* Add shadow */
+                z-index: 1;
+                top: 90%; /* Position below the button */
+                left: 45%;
+                border-radius: 8px;
+                padding: 0; /* Remove extra padding from <ul> */
+                list-style-type: none; /* Remove bullets */
+            }
+      
+        .dropdown-content li {
+                position: relative; /* Needed to position nested dropdown */
+                display: flex;
+                align-items: center; 
+                gap: 8px; 
+                margin-left: 20px;
+                
+            }
+        .dropdown-content li a {
+                color: black;
+                /* padding: 12px 16px; */
+                padding:8px 12px;
+                text-decoration: none;
+                display: flex;
+                align-items:baseline; 
+                justify-content: center; 
+                gap: 8px; 
+            }
+        
+        /* Rotate the chevron icon when the dropdown is active */
+        .btn.active .chevron-icon {
+            transform: rotate(90deg); /* Rotate to indicate dropdown is open */
+        }
+        .chevron-icon.active {
+            transform: rotate(90deg); /* Rotate the chevron when active */
+        }
+        .nested-dropdown-content {
+            display: none; /* Hide nested dropdown by default */
+            position: absolute;
+            min-width: 200px;
+            left: 109%; /* Position it to the right of the parent */
+            top: 5%;
+            background-color: white;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .nested-dropdown-content li {
+            margin-bottom: 15px; /* Space between list items */
+            margin-left: 20px;
+        }
+         .nested-dropdown-content li a {
+            color: black;
+            /* padding: 12px 16px; */
+            /* margin-left: 40px; */
+            text-decoration: none;
+            display: block;
+        }
+        .nested-dropdown-content li a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .nested-dropdown-content {
+            display: block; /* Show nested dropdown on hover */
+        }
+
+        .btn1 {
+            background-color: rgb(0, 0, 0); /* Blue background */
+            border-radius: 8px; /* Remove borders */
+            color: white; /* White text */
+            padding: 12px 16px; /* Some padding */
+            font-size: 16px; /* Set a font size */
+            cursor: pointer; /* Mouse pointer on hover */
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Center the text inside the button */
+            width: 250px; /* Set a fixed width for the button */
+            margin-left: 35px;
+            position: relative; /* Position relative for dropdown positioning */
+        }
+        .btn1 i {
+            margin-right: 23px;
+        }
+        .btn1:hover {
+            background-color: rgb(35, 76, 63);
+        }
+        .tab {
+            display:none; /* Use flexbox */
+            flex-direction: column; /* Ensure children stack vertically */
+            justify-content: flex-start; /* Align content at the top of the container */
+            border-radius: 8px;
+            margin-top: -5px;
+            width: 200%; /* Adjust width as desired */
+            margin-left: 125%; /* Remove extra margin */
+            top: 20%;
+            }
+    
+            .tab h2{
+            margin-left: 30%;
+            margin-top: 20px; 
+            color: black;
+            font-size: 34px;
+            text-align: center;
+            }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="Usersbackground">
+        <div class="container">
+            <div class="applogo"></div>
+            <div class="nav-container">
+                <button class="btn" id="dropdownBtn">
+                    <i class="fa fa-home" style="font-size:24px;color:white"></i>
+                    Account
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <ul class="dropdown-content" id="dropdownContent">
+                    <li id="overviewLink">
+                        <a href="#">View & Download<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
+                            <polyline points="9 6 15 12 9 18"></polyline>
+                        </svg></a>
+                    </li> 
+                    <li id="overviewLink">
+                        <a href="#">Approve & DEcline <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg></a>
+                    </li> 
+                    
+                </ul> 
+                <button class="btn" >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="24" height="24">
+                        <!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
+                        <path d="M112 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-223.1L59.4 304.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6l29.7 0c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L232 256.9 232 480c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128-16 0z" fill="white"/>
+                    </svg>
+                    Resource
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon"></svg>
+                </button>
+        
+            </div>
+        </div>
+    </div>  
+    <script>
+                // Toggle the main dropdown (show only "Overview") when "Dashboard" is clicked
+        document.getElementById("dropdownBtn").addEventListener("click", function (event) {
+            event.stopPropagation(); // Prevent event propagation
+            const dropdownContent = document.getElementById("dropdownContent");
+            dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+
+            // Close the "Users" section or other sections if open
+            hideAllSections();
+
+            // Toggle chevron rotation for active state
+            this.classList.toggle("active");
+        });
+
+        // Toggle the nested dropdown when "Overview" is clicked
+        document.getElementById("overviewLink").addEventListener("click", function (event) {
+            event.preventDefault(); // Prevent default link behavior
+            event.stopPropagation(); // Prevent event propagation
+
+            const nestedDropdownContent = document.getElementById("nestedDropdownContent");
+            nestedDropdownContent.style.display = nestedDropdownContent.style.display === "block" ? "none" : "block";
+
+            // Rotate chevron icon if the nested dropdown is opened
+            const chevronIcon = this.querySelector(".chevron-icon");
+            chevronIcon.classList.toggle("active");
+        });
+
+        // Close dropdowns and sections when clicking outside
+        window.addEventListener("click", function (event) {
+            const dropdownContent = document.getElementById("dropdownContent");
+            const dropdownBtn = document.getElementById("dropdownBtn");
+            const overviewLink = document.getElementById("overviewLink");
+            const nestedDropdownContent = document.getElementById("nestedDropdownContent");
+
+            // Close the main dropdown if clicked outside of it
+            if (!dropdownBtn.contains(event.target)) {
+                dropdownContent.style.display = "none";
+                dropdownBtn.classList.remove("active"); // Remove chevron rotation for main button
+            }
+
+            // Close nested dropdown if clicked outside of "Overview"
+            if (!overviewLink.contains(event.target)) {
+                nestedDropdownContent.style.display = "none";
+                overviewLink.querySelector(".chevron-icon").classList.remove("active");
+            }
+
+            // Hide all sections if clicking outside any section
+            <!-- hideAllSections(); -->
+        });
+
+        // Function to toggle the visibility of a section
+        function toggleSection(sectionId) {
+            document.querySelectorAll(".main").forEach((section) => {
+                if (section.id === sectionId) {
+                    // Toggle the visibility of the clicked section
+                    section.style.display = section.style.display === "block" ? "none" : "block";
+                } else {
+                    // Hide all other sections
+                    section.style.display = "none";
+                }
+            });
+        }
+        // Function to hide all sections
+        function hideAllSections() {
+            document.querySelectorAll(".main").forEach((section) => {
+                section.style.display = "none";
+            });
+        }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verify Email</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    hr {
+      margin: 20px 0;
+    }
+    p {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+    }
+    input[type="email"] {
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      flex: 1;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    @media (max-width: 480px) {
+      body {
+        margin: 10px;
+      }
+      form {
+        padding: 15px;
+      }
+      input[type="email"], button {
+        font-size: 0.9rem;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h3>Verification Message sent to your Email, Check and Verify</h3>
+  <hr />
+  <p>If email not received, Resend</p>
+  <form id="resendForm">
+    <input type="email" id="email" placeholder="Enter your email" required />
+    <button type="submit">Resend Verification Email</button>
+  </form>
+
+  <script>
+    document.getElementById("resendForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      let email = document.getElementById("email").value;
+
+      fetch("/resend-verification/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: "email=" + encodeURIComponent(email),
+      })
+        .then((response) => response.json())
+        .then((data) => alert(data.message))
+        .catch((error) => console.error("Error:", error));
+    });
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
+</body>
+</html>

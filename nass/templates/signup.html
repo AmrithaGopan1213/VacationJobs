@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGN UP</title>
+  <style>
+    body{
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        position: relative; 
+        transition: filter 0.5s ease;
+        z-index: -1;
+        /* filter: blur(0);  */
+    }
+
+    .background-container {
+      background-image: url('/static/Images/Image4.jpeg')  ;
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1; /* Ensure the background stays behind the content */
+    }
+
+    .container{
+        background-color: rgba(229, 221, 66, 0.6);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgb(0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        max-width: 400px;
+        border: 2px solid white;
+        /* transition: backdrop-filter 0.5s ease; Smooth transition for backdrop filter */
+        backdrop-filter: blur(5px); /* Apply a blur effect to the background */
+        z-index: 1; /* Ensure the container is above the background */
+    }
+    .container a {
+      color: rgb(88, 5, 5); /* Change the color of the <a> tag */
+      text-decoration: none; /* Remove underline from the <a> tag */
+    }
+    .container a:hover {
+      text-decoration: underline; /* Add underline on hover */
+    }
+    .container p {
+      text-decoration: none; /* Remove underline from the <a> tag */
+    }
+
+    .form-section {
+      width: 45%; /* Adjust the width of each form section */
+    }
+
+    h1{
+      text-align: center;
+      width: 100%;
+      margin-top: 15px;
+      top: 20px; /* Adjust the top position */
+    }
+
+    form{
+      flex-direction: column;
+      margin-bottom: 20px;
+      margin-top: 10px;
+    }
+
+    label{
+      margin-bottom: 5px;
+      color: white;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    select{
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid whitesmoke;
+      border-radius: 4px;
+      width: calc(100% - 20px); 
+    }
+
+    button{
+      background-color: rgb(65, 76, 225);
+      color:white;
+      padding: 10px;margin: 2px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      width: calc(100% - 20px);
+    }
+
+    button:hover{
+      background-color: rgb(28, 28, 90);
+    }
+    .error-message{
+      color: red;
+      font-size: 0.9em;
+      display: none; 
+    }
+    .error--message{
+      color: red;
+      font-size: 20px;
+      font: 700;
+    }
+    .btn-section{
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+    <div class="background-container"></div>
+    <div class="container">
+        <h1>SIGN-UP</h1>
+        <p>Already have an account? 
+            <a href="{% url 'login1' %}" > Click here to login</a>
+        </p>
+        <form id="registration-form" action="" method="POST">
+            {% csrf_token %}
+
+            <input type="text" id="firstname" placeholder="Enter Your First name" name="first_name" required>
+            <span id="firstname-error" class="error-message">Firstname must contain only characters.</span><br>
+
+            <input type="email" id="email" placeholder="Enter Your Email" name="email" required>
+            <span id="email-error" class="error-message" style="display: none;">Please enter a valid email address.</span><br>
+
+            <input type="tel" id="phonenumber" placeholder="Enter Your Phone Number" name="phone" required>
+            <span id="phonenumber-error" class="error-message">Phone number must contain only numbers.</span><br>
+
+            <input type="text" id="username" placeholder="Enter the username" name="username" required>
+            <span id="username-error" class="error-message">Username must contain only characters.</span><br>
+
+            <input type="password" id="password" placeholder="Enter the password" name="password" required>
+            <span id="password-error" class="error-message">Password must contain only numbers.</span><br>
+
+            <input type="password" id="cpassword" placeholder="Enter the confirm password" name="confirmpassword" required>
+            <span id="confirm-password-error" class="error-message">Passwords do not match.</span><br><hr>
+
+            <input type="text" id="referal_link" placeholder="Enter the Referal Link (optional)" name="referal_link" >
+            <span id="link-error" class="error-message">Link is invalid</span><br>
+
+            <!-- <label for="usertype">User Type:</label>
+            <select id="usertype" name="usertype" required>
+              <option value="users">Users</option>
+              <option value="team">Verification Team</option>
+            </select>  -->
+            <div class="btn-section">
+            <button type="submit" onclick="return validateForm(event)">SUBMIT</button>
+            <button type="reset">CLEAR</button>
+            </div>
+        </form>
+        {% if messages %}
+            <div class="error--message">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+  <script src="{% static 'Js/signup.js' %}"></script>
+</body>
+</html>

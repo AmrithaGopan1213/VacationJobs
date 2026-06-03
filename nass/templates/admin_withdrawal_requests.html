@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Withdrawal Requests</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f7fa;
+    color: #333;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .go-back-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    background-color: #3498db;
+    color: #fff;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+  }
+
+  .go-back-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .go-back-btn i {
+    margin-right: 8px;
+  }
+
+  /* Messages styling */
+  .messages {
+    margin: 20px 0;
+  }
+  
+  .alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+  }
+  
+  .alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+  
+  .alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+  }
+
+  /* Table styling */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Status badges */
+  .status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  .status-approved {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .status-rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  /* Action buttons */
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn i {
+    margin-right: 5px;
+  }
+
+  .btn-approve {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .btn-approve:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+  }
+
+  .btn-reject {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .btn-reject:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+  }
+
+  .btn-disabled {
+    background-color: #6c757d;
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  .payment-ref {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+    word-break: break-all;
+  }
+
+  /* Rejection form styling */
+  .rejection-form {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .rejection-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 60px;
+    margin-bottom: 8px;
+  }
+
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+
+    .container {
+      padding: 15px;
+    }
+
+    th, td {
+      padding: 8px 10px;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 24px;
+    }
+
+    .go-back-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* Animation for status change */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .updated-row {
+    animation: fadeIn 1s ease-in;
+  }
+
+  /* Loading spinner */
+  .btn-approve .fa-spinner {
+    margin-right: 5px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Withdrawal Requests Management</h1>
+  
+  <div class="header-actions">
+    <a href="javascript:history.back()" class="go-back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Messages display -->
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}times-circle{% else %}exclamation-circle{% endif %}"></i>
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User</th>
+          <th>Amount</th>
+          <th>Bank Details</th>
+          <th>Request Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in requests %}
+        <tr id="request-{{ req.id }}">
+          <td>#{{ req.id }}</td>
+          <td>
+            <strong>{{ req.user.username }}</strong><br>
+            <small>{{ req.user.email }}</small>
+          </td>
+          <td>₹{{ req.amount }}</td>
+          <td>
+            {{ req.bank_account }}<br>
+            {% if req.user.bank_details %}
+              <small class="text-muted">{{ req.user.bank_details.ifsc_code }}</small>
+            {% endif %}
+          </td>
+          <td>
+            {{ req.requested_at|date:"M d, Y" }}<br>
+            <small>{{ req.requested_at|time:"H:i" }}</small>
+          </td>
+          <td>
+            <span class="status-badge status-{{ req.status|lower }}">
+              {{ req.status }}
+            </span>
+            {% if req.payment_reference %}
+              <div class="payment-ref">
+                Ref: {{ req.payment_reference }}
+              </div>
+            {% endif %}
+            {% if req.error_message %}
+              <div class="payment-ref" style="color: #dc3545;">
+                {{ req.error_message }}
+              </div>
+            {% endif %}
+          </td>
+          <td>
+            {% if req.status == 'Pending' %}
+            <div class="action-buttons">
+              <!-- Approval Form -->
+              <form method="POST" action="{% url 'admin_withdrawal_requests' %}" id="approve-form-{{ req.id }}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="request_id" value="{{ req.id }}">
+                <input type="hidden" name="action" value="approve">
+                <button type="button" class="btn btn-approve" onclick="confirmApprove('{{ req.id }}')">
+                  <i class="fas fa-check"></i> Approve
+                </button>
+              </form>
+              
+              <!-- Reject Button (triggers form display) -->
+              <button type="button" class="btn btn-reject" onclick="showRejectionForm('{{ req.id }}')">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            </div>
+            
+            <!-- Rejection Form (hidden by default) -->
+            <form method="POST" action="{% url 'admin_withdrawal_requests' %}" class="rejection-form" id="reject-form-{{ req.id }}">
+              {% csrf_token %}
+              <input type="hidden" name="request_id" value="{{ req.id }}">
+              <input type="hidden" name="action" value="reject">
+              <textarea name="rejection_reason" placeholder="Reason for rejection..." required></textarea>
+              <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn btn-reject">
+                  <i class="fas fa-paper-plane"></i> Confirm Rejection
+                </button>
+                <button type="button" class="btn btn-disabled" onclick="hideRejectionForm('{{ req.id }}')">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+            {% else %}
+            <span class="status-badge status-{{ req.status|lower }}">
+              {{ req.status }}
+              {% if req.payment_reference %}
+              <div class="payment-ref">Ref: {{ req.payment_reference }}</div>
+              {% endif %}
+            </span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 30px;">
+            <i class="fas fa-inbox" style="font-size: 24px; color: #6c757d; margin-bottom: 10px;"></i><br>
+            No pending withdrawal requests
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function confirmApprove(requestId) {
+    if (confirm(`Are you sure you want to approve withdrawal #${requestId}?`)) {
+        const form = document.getElementById(`approve-form-${requestId}`);
+        const approveBtn = form.querySelector('button');
+        
+        // Show loading state
+        approveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        approveBtn.disabled = true;
+        
+        // Submit the form
+        form.submit();
+    }
+}
+
+function showRejectionForm(requestId) {
+    const rejectForm = document.getElementById(`reject-form-${requestId}`);
+    const actionButtons = document.querySelector(`#request-${requestId} .action-buttons`);
+    
+    // Hide action buttons and show rejection form
+    actionButtons.style.display = 'none';
+    rejectForm.style.display = 'block';
+}
+
+function hideRejectionForm(requestId) {
+    const rejectForm = document.getElementById(`reject-form-${requestId}`);
+    const actionButtons = document.querySelector(`#request-${requestId} .action-buttons`);
+    
+    // Show action buttons and hide rejection form
+    actionButtons.style.display = 'flex';
+    rejectForm.style.display = 'none';
+}
+
+// Auto-hide messages after 5 seconds
+document.querySelectorAll('.alert').forEach(alert => {
+    setTimeout(() => {
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 500);
+    }, 5000);
+});
+</script>
+
+</body>
+</html>
