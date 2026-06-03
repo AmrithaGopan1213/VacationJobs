@@ -15,12 +15,18 @@ pip install -r requirements.txt
 python manage.py migrate
 
 python manage.py runserver
+
 --------------------------------------------------------------------------------
 ✨ Features
 
 🔐 User Registration & Login
+
 🧑‍🎓 Student Dashboard – View and apply to job listings
+
 🏢 Company Dashboard – Post and manage job opportunities
+
 📃 Job Listings – Search, apply, and track job applications
+
 📬 Admin Panel – Manage all users and posted jobs
+
 
